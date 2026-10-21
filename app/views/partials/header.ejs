@@ -46,7 +46,6 @@
             <a href="/profile" class="header-user-pill" title="Trang cá nhân của <%= currentUser.username %>">
               <img src="<%= currentUser.avatar || '/public/images/logo.png' %>" alt="<%= currentUser.username %>" class="header-user-avatar" onerror="this.src='/public/images/logo.png'">
               <span class="header-user-name"><%= currentUser.username %></span>
-              <span class="header-user-coins" title="Số Xu tích lũy">🪙 <%= currentUser.coins || 50 %></span>
             </a>
 
             <a href="/auth/logout" class="header-logout-btn" title="Đăng xuất khỏi tài khoản">
@@ -87,7 +86,7 @@
           <a href="/stories" class="main-nav-link <%= currentPath.startsWith('/stories') ? 'active' : '' %>">
             Đọc Truyện ▾
           </a>
-          <!-- Mega-Menu 7 thể loại truyện chuẩn phong cách Vnkings -->
+          <!-- Mega-Menu 6 thể loại truyện chuẩn phong cách Vnkings -->
           <div class="nav-dropdown">
             <% if (typeof genres !== 'undefined' && genres && genres.length > 0) { %>
               <% genres.forEach(g => { %>
@@ -100,7 +99,6 @@
               <a href="/stories?genre=tinh-cam" class="nav-dropdown-item"><span>💖</span> Tình Cảm</a>
               <a href="/stories?genre=di-gioi" class="nav-dropdown-item"><span>🌀</span> Dị Giới</a>
               <a href="/stories?genre=xuyen-khong" class="nav-dropdown-item"><span>⏳</span> Xuyên Không</a>
-              <a href="/stories?genre=tien-hiep" class="nav-dropdown-item"><span>⚔️</span> Tiên Hiệp</a>
               <a href="/stories?genre=do-thi" class="nav-dropdown-item"><span>🏙️</span> Đô Thị</a>
               <a href="/stories?genre=kiem-hiep" class="nav-dropdown-item"><span>🗡️</span> Kiếm Hiệp</a>
             <% } %>
@@ -120,14 +118,13 @@
     </div>
   </nav>
 
-  <!-- 3. Sub-genre Quick Access Strip (7 Thể loại chính tối giản phong cách Vnkings) -->
+  <!-- 3. Sub-genre Quick Access Strip (6 Thể loại chuẩn) -->
   <div class="sub-genre-strip">
     <div class="container sub-genre-grid">
       <a href="/stories?genre=truyen-ngan" class="sub-genre-link">Truyện Ngắn</a>
       <a href="/stories?genre=tinh-cam" class="sub-genre-link">Tình Cảm</a>
       <a href="/stories?genre=di-gioi" class="sub-genre-link">Dị Giới</a>
       <a href="/stories?genre=xuyen-khong" class="sub-genre-link">Xuyên Không</a>
-      <a href="/stories?genre=tien-hiep" class="sub-genre-link">Tiên Hiệp</a>
       <a href="/stories?genre=do-thi" class="sub-genre-link">Đô Thị</a>
       <a href="/stories?genre=kiem-hiep" class="sub-genre-link">Kiếm Hiệp</a>
       <span class="sub-genre-sep">|</span>

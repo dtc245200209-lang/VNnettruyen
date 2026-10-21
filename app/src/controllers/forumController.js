@@ -216,11 +216,8 @@ exports.postCreatePost = async (req, res) => {
       VALUES (?, ?, ?, ?, ?)
     `, [category_id, userId, title.trim(), uniqueSlug, cleanContent]);
 
-    // Thưởng 2 Xu cho người đăng bài viết mới
-    await db.query('UPDATE users SET coins = coins + 2 WHERE id = ?', [userId]);
-
     logger.info(`Người dùng ${req.session.user.username} đã tạo bài viết diễn đàn mới: ${title.trim()}`);
-    req.flash('success_msg', 'Đăng bài viết mới thành công! Bạn nhận được +2 Xu đóng góp diễn đàn.');
+    req.flash('success_msg', 'Đăng bài viết mới thành công!');
     res.redirect(`/forum/posts/${uniqueSlug}`);
   } catch (err) {
     logger.error('Lỗi khi lưu bài viết diễn đàn:', err);
@@ -304,11 +301,8 @@ exports.postReply = async (req, res) => {
     // Cập nhật updated_at cho post
     await db.query('UPDATE forum_posts SET updated_at = NOW() WHERE id = ?', [postId]);
 
-    // Thưởng 1 Xu cho người tham gia thảo luận
-    await db.query('UPDATE users SET coins = coins + 1 WHERE id = ?', [userId]);
-
     logger.info(`Người dùng ${req.session.user.username} đã phản hồi bài viết ID ${postId}`);
-    req.flash('success_msg', 'Gửi phản hồi thành công! Bạn nhận được +1 Xu tương tác.');
+    req.flash('success_msg', 'Gửi phản hồi thành công!');
     res.redirect(`/forum/posts/${postSlug}#replies`);
   } catch (err) {
     logger.error('Lỗi khi lưu phản hồi bài viết diễn đàn:', err);

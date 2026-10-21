@@ -5,7 +5,8 @@
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",
-    "dev": "nodemon src/app.js"
+    "dev": "nodemon src/app.js",
+    "import-stories": "node src/scripts/importStories.js"
   },
   "keywords": [
     "vnnettruyen",
@@ -27,6 +28,7 @@
     "express-rate-limit": "^7.2.0",
     "express-session": "^1.18.0",
     "helmet": "^7.1.0",
+    "mammoth": "^1.13.0",
     "morgan": "^1.10.0",
     "mysql2": "^3.9.7",
     "prom-client": "^15.1.2",

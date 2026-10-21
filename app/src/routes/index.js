@@ -20,11 +20,11 @@ router.get('/stories/:slug/chapters/:chapterNumber', storyController.getChapter)
 router.post('/comments', requireAuth, storyController.postComment);
 router.post('/comments/:commentId/delete', requireAuth, storyController.deleteComment);
 
-// 6. Tủ sách cá nhân (yêu cầu đăng nhập)
-router.post('/bookmark/toggle', requireAuth, storyController.toggleBookmark);
+const authController = require('../controllers/authController');
 
-// 7. API Điểm danh nhận Xu hằng ngày
-router.post('/api/checkin', storyController.postDailyCheckin);
+// 6. Trang hồ sơ cá nhân
+router.get('/profile', requireAuth, authController.getProfile);
+router.post('/profile', requireAuth, authController.postProfile);
 
 // 8. API Tìm kiếm nhanh gợi ý
 router.get('/api/search', async (req, res) => {

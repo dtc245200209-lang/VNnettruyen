@@ -84,74 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 3. Điểm Danh Hằng Ngày (Daily Check-in AJAX)
-  const btnAttendance = document.getElementById('btn-daily-attendance');
-  const userCoinsBadge = document.getElementById('user-header-coins');
-  const attendanceTicker = document.getElementById('attendance-ticker-list');
-
-  if (btnAttendance) {
-    btnAttendance.addEventListener('click', async () => {
-      try {
-        btnAttendance.disabled = true;
-        btnAttendance.innerText = 'Đang điểm danh...';
-
-        const res = await fetch('/api/checkin', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          }
-        });
-
-        const data = await res.json();
-
-        if (data.requireLogin) {
-          alert('Vui lòng đăng nhập để điểm danh nhận Xu!');
-          window.location.href = '/auth/login';
-          return;
-        }
-
-        if (data.success) {
-          alert(`🎉 ${data.message}`);
-          btnAttendance.innerText = '✅ Đã Điểm Danh Hôm Nay';
-          btnAttendance.style.background = '#16a34a';
-
-          // Cập nhật số Xu trên header
-          if (userCoinsBadge) {
-            userCoinsBadge.innerHTML = `💰 ${data.totalCoins} Xu`;
-          }
-
-          // Chèn vào ticker
-          if (attendanceTicker) {
-            const newRow = document.createElement('div');
-            newRow.className = 'attendance-ticker-item';
-            newRow.innerHTML = `<strong>Bạn</strong> vừa điểm danh thành công nhận được <strong>${data.earnedCoins} Xu</strong>!`;
-            attendanceTicker.prepend(newRow);
-          }
-        } else {
-          alert(data.message);
-          btnAttendance.disabled = false;
-          btnAttendance.innerText = '⭐ Điểm Danh Nhận Xu';
-        }
-      } catch (err) {
-        console.error('Lỗi điểm danh:', err);
-        alert('Lỗi máy chủ khi điểm danh.');
-        btnAttendance.disabled = false;
-        btnAttendance.innerText = '⭐ Điểm Danh Nhận Xu';
-      }
-    });
-  }
-
-  // 4. Nhận nhiệm vụ hằng ngày (Claim Tasks)
-  const taskButtons = document.querySelectorAll('.btn-task-claim');
-  taskButtons.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      alert('Nhiệm vụ đang tiến hành! Hãy hoàn thành lượt đọc truyện, bình luận hoặc lưu bài viết để nhận thưởng.');
-    });
-  });
-
-  // 5. Chuyển Tab Bảng Xếp Hạng (Ranking Tabs)
+  // 3. Chuyển Tab Bảng Xếp Hạng (Ranking Tabs)
   const rankingTabButtons = document.querySelectorAll('.ranking-tab-btn');
   rankingTabButtons.forEach(btn => {
     btn.addEventListener('click', () => {

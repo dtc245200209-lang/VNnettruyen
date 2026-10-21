@@ -44,7 +44,7 @@
           Tác giả: <strong><%= spotlightStory.author_name %></strong>
         </div>
         <div class="spotlight-meta-line">
-          Thể loại: <strong><%= spotlightStory.primary_genre || 'Tiên Hiệp / Dã Sử' %></strong>
+          Thể loại: <strong><%= spotlightStory.primary_genre || 'Kiếm Hiệp / Dã Sử' %></strong>
         </div>
         <div class="spotlight-meta-line">
           Lượt xem: <strong><%= spotlightStory.views %></strong>
@@ -76,8 +76,8 @@
         <span>📖 Truyện Ngắn & Tác Phẩm Việt Chọn Lọc</span>
         <span>&rsaquo;</span>
       </a>
-      <a href="/stories?genre=tien-hiep" class="forum-hub-item">
-        <span>⚔️ Tiên Hiệp & Kiếm Hiệp Chọn Lọc</span>
+      <a href="/stories?genre=kiem-hiep" class="forum-hub-item">
+        <span>⚔️ Kiếm Hiệp & Dị Giới Chọn Lọc</span>
         <span>&rsaquo;</span>
       </a>
       <a href="/stories" class="forum-hub-item">
@@ -308,55 +308,76 @@
       </div>
     </div>
 
-    <!-- Widget 3: Điểm Danh Hằng Ngày Nhận Xu -->
+    <!-- Widget 3: Chủ Đề Diễn Đàn Sôi Nổi Nhất -->
     <div class="sidebar-card">
-      <button id="btn-daily-attendance" class="btn-attendance">
-        ⭐ Điểm Danh Nhận Xu
-      </button>
-      <div style="font-size: 0.8rem; font-weight: 700; margin-bottom: 6px; color: var(--text-muted);">
-        Thành viên vừa nhận thưởng:
-      </div>
-      <div id="attendance-ticker-list" class="attendance-ticker">
-        <% if (checkinFeed && checkinFeed.length > 0) { %>
-          <% checkinFeed.forEach(item => { %>
-            <div class="attendance-ticker-item">
-              <strong><%= item.username %></strong> điểm danh thành công nhận được <span style="color: #ea580c; font-weight: 700;"><%= item.coins_earned %> Xu</span> từ hệ thống.
+      <div class="sidebar-title">🔥 Chủ đề sôi nổi tuần này</div>
+      <div style="display: flex; flex-direction: column; gap: 10px; padding-top: 4px;">
+        <% if (typeof forumPosts !== 'undefined' && forumPosts && forumPosts.length > 0) { %>
+          <% forumPosts.slice(0, 4).forEach((fp, idx) => { %>
+            <div style="display: flex; gap: 10px; align-items: flex-start; font-size: 0.82rem; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+              <span style="font-weight: 800; color: <%= idx === 0 ? '#ea580c' : 'var(--text-muted)' %>; font-size: 0.9rem;">#<%= idx + 1 %></span>
+              <div style="flex: 1; min-width: 0;">
+                <a href="/forum/posts/<%= fp.slug %>" style="font-weight: 700; color: var(--text-main); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.35;">
+                  <%= fp.title %>
+                </a>
+                <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 3px; display: flex; gap: 8px;">
+                  <span>💬 <%= fp.reply_count || 0 %> phản hồi</span>
+                  <span>👁️ <%= fp.views || 0 %> xem</span>
+                </div>
+              </div>
             </div>
           <% }) %>
-        <% } else { %>
-          <div class="attendance-ticker-item">
-            <strong>Độc Giả VN</strong> điểm danh nhận được 5 Xu.
-          </div>
         <% } %>
       </div>
     </div>
 
-    <!-- Widget 4: Nhiệm Vụ Hôm Nay -->
+    <!-- Widget 4: Thành Viên & Tác Giả Tích Cực -->
     <div class="sidebar-card">
-      <div class="sidebar-title">Nhiệm vụ hôm nay</div>
-      
-      <div class="task-item">
-        <div>
-          <div style="font-weight: 700;">Nhiệm vụ Đọc truyện</div>
-          <div style="color: var(--text-muted); font-size: 0.75rem;">Đọc ít nhất 1 chương truyện [3 Xu]</div>
+      <div class="sidebar-title">✍️ Thành viên & Tác giả tích cực</div>
+      <div style="display: flex; flex-direction: column; gap: 10px; padding-top: 4px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <img src="/public/images/logo.png" alt="admin" style="width: 28px; height: 28px; border-radius: 50%;">
+            <div>
+              <strong>admin</strong>
+              <div style="font-size: 0.7rem; color: var(--text-muted);">Quản trị viên</div>
+            </div>
+          </div>
+          <span style="font-size: 0.72rem; padding: 2px 6px; background-color: #fee2e2; color: #b91c1c; border-radius: 4px; font-weight: 700;">Admin</span>
         </div>
-        <button class="btn btn-task-claim">Nhận xu</button>
-      </div>
 
-      <div class="task-item">
-        <div>
-          <div style="font-weight: 700;">Nhiệm vụ Tủ sách</div>
-          <div style="color: var(--text-muted); font-size: 0.75rem;">Thêm truyện vào tủ sách [3 Xu]</div>
+        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <img src="/public/images/default-avatar.png" alt="tacgia_viet" style="width: 28px; height: 28px; border-radius: 50%;">
+            <div>
+              <strong>tacgia_viet</strong>
+              <div style="font-size: 0.7rem; color: var(--text-muted);">Tác giả dã sử & kiếm hiệp</div>
+            </div>
+          </div>
+          <span style="font-size: 0.72rem; padding: 2px 6px; background-color: #fef3c7; color: #b45309; border-radius: 4px; font-weight: 700;">Tác giả</span>
         </div>
-        <button class="btn btn-task-claim">Nhận xu</button>
-      </div>
 
-      <div class="task-item">
-        <div>
-          <div style="font-weight: 700;">Nhiệm vụ Bình luận</div>
-          <div style="color: var(--text-muted); font-size: 0.75rem;">Gửi bình luận thảo luận [5 Xu]</div>
+        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <img src="/public/images/default-avatar.png" alt="docgia_vn" style="width: 28px; height: 28px; border-radius: 50%;">
+            <div>
+              <strong>docgia_vn</strong>
+              <div style="font-size: 0.7rem; color: var(--text-muted);">Độc giả thân thiết</div>
+            </div>
+          </div>
+          <span style="font-size: 0.72rem; padding: 2px 6px; background-color: #e0f2fe; color: #0369a1; border-radius: 4px; font-weight: 700;">Độc giả</span>
         </div>
-        <button class="btn btn-task-claim">Nhận xu</button>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <img src="/public/images/default-avatar.png" alt="Meovangnho" style="width: 28px; height: 28px; border-radius: 50%;">
+            <div>
+              <strong>Meovangnho</strong>
+              <div style="font-size: 0.7rem; color: var(--text-muted);">Thành viên cộng đồng</div>
+            </div>
+          </div>
+          <span style="font-size: 0.72rem; padding: 2px 6px; background-color: #f3e8ff; color: #7e22ce; border-radius: 4px; font-weight: 700;">Thành viên</span>
+        </div>
       </div>
     </div>
 

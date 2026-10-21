@@ -47,6 +47,7 @@ services:
     volumes:
       # Bind mount mã nguồn từ máy thật vào container để chỉnh sửa trực tiếp qua VS Code
       - ./app:/usr/src/app
+      - ./stories_import:/usr/src/app/stories_import
       # Giữ nguyên node_modules trong container
       - /usr/src/app/node_modules
       - app_logs:/usr/src/app/logs

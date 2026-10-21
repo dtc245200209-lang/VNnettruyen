@@ -12,24 +12,27 @@ const sanitizeOptions = {
 // 1. Trang chủ phong cách Diễn Đàn Sáng Tác & Đọc Truyện (Vnkings Style)
 exports.getHome = async (req, res) => {
   try {
-    // 1. Top View Tuần (Dải sách ngang trên cùng)
+    // 1. Top View Tuần (Dải sách ngang trên cùng - Chỉ lấy truyện đã có chương)
     const [topWeeklyStories] = await db.query(`
       SELECT s.id, s.title, s.slug, s.cover_image, s.views, u.username AS author_name,
              (SELECT COUNT(*) FROM chapters WHERE story_id = s.id AND status = 'published') AS total_chapters
       FROM stories s
       JOIN users u ON s.author_id = u.id
+      HAVING total_chapters > 0
       ORDER BY s.views DESC
       LIMIT 10
     `);
 
-    // 2. Tác phẩm tiêu biểu (Spotlight Banner)
+    // 2. Tác phẩm tiêu biểu (Spotlight Banner - Bắt buộc có chương)
     const [spotlightRows] = await db.query(`
       SELECT s.id, s.title, s.slug, s.cover_image, s.description, s.views,
              u.username AS author_name,
-             (SELECT name FROM genres g JOIN story_genres sg ON g.id = sg.genre_id WHERE sg.story_id = s.id LIMIT 1) AS primary_genre
+             (SELECT name FROM genres g JOIN story_genres sg ON g.id = sg.genre_id WHERE sg.story_id = s.id LIMIT 1) AS primary_genre,
+             (SELECT COUNT(*) FROM chapters WHERE story_id = s.id AND status = 'published') AS total_chapters
       FROM stories s
       JOIN users u ON s.author_id = u.id
       WHERE s.is_featured = 1
+      HAVING total_chapters > 0
       ORDER BY s.views DESC
       LIMIT 1
     `);
@@ -83,14 +86,8 @@ exports.getHome = async (req, res) => {
       ORDER BY c.display_order ASC
     `);
 
-    // 6. Dòng tin Điểm Danh thành viên (Check-in Ticker)
-    const [checkinFeed] = await db.query(`
-      SELECT d.coins_earned, d.created_at, u.username
-      FROM daily_checkins d
-      JOIN users u ON d.user_id = u.id
-      ORDER BY d.created_at DESC
-      LIMIT 6
-    `);
+    // 6. Danh sách cập nhật hoạt động
+    const checkinFeed = [];
 
     // 7. Thống kê diễn đàn & cộng đồng người dùng
     const [[statUsers]] = await db.query('SELECT COUNT(*) AS count FROM users');
@@ -111,11 +108,13 @@ exports.getHome = async (req, res) => {
     // 8. Tất cả thể loại phục vụ Mega-Menu & Subnav
     const [genres] = await db.query('SELECT * FROM genres ORDER BY name ASC');
 
-    // 9. Bảng xếp hạng (Rankings sidebar)
+    // 9. Bảng xếp hạng (Chỉ hiển thị truyện đã có chương)
     const [rankingStories] = await db.query(`
-      SELECT s.id, s.title, s.slug, s.cover_image, s.views, u.username AS author_name
+      SELECT s.id, s.title, s.slug, s.cover_image, s.views, u.username AS author_name,
+             (SELECT COUNT(*) FROM chapters WHERE story_id = s.id AND status = 'published') AS total_chapters
       FROM stories s
       JOIN users u ON s.author_id = u.id
+      HAVING total_chapters > 0
       ORDER BY s.views DESC
       LIMIT 10
     `);
@@ -158,7 +157,10 @@ exports.getStories = async (req, res) => {
 
     const { q, genre, status, sort } = req.query;
 
-    let whereConditions = ['1=1'];
+    // Chỉ hiển thị truyện có ít nhất 1 chương đã xuất bản
+    let whereConditions = [
+      '(SELECT COUNT(*) FROM chapters WHERE story_id = s.id AND status = "published") > 0'
+    ];
     let queryParams = [];
 
     if (q && q.trim() !== '') {
@@ -490,41 +492,13 @@ exports.toggleBookmark = async (req, res) => {
   }
 };
 
-// 8. Điểm danh nhận Xu hằng ngày (Daily Check-in API)
+// 8. Chức năng tương tác cộng đồng
 exports.postDailyCheckin = async (req, res) => {
   if (!req.session.user) {
-    return res.status(401).json({ success: false, message: 'Vui lòng đăng nhập để điểm danh!' });
+    return res.status(401).json({ success: false, message: 'Vui lòng đăng nhập để tiếp tục!' });
   }
-
-  const userId = req.session.user.id;
-
-  try {
-    const [todayCheckin] = await db.query(
-      'SELECT id FROM daily_checkins WHERE user_id = ? AND DATE(created_at) = CURDATE() LIMIT 1',
-      [userId]
-    );
-
-    if (todayCheckin.length > 0) {
-      return res.json({ success: false, message: 'Bạn đã điểm danh hôm nay rồi! Hãy quay lại vào ngày mai nhé.' });
-    }
-
-    // Tặng ngẫu nhiên từ 3 đến 10 Xu
-    const earnedCoins = Math.floor(Math.random() * 8) + 3;
-
-    await db.query('INSERT INTO daily_checkins (user_id, coins_earned) VALUES (?, ?)', [userId, earnedCoins]);
-    await db.query('UPDATE users SET coins = COALESCE(coins, 0) + ? WHERE id = ?', [earnedCoins, userId]);
-
-    const [[updatedUser]] = await db.query('SELECT coins FROM users WHERE id = ?', [userId]);
-
-    logger.info(`Người dùng ${req.session.user.username} điểm danh nhận ${earnedCoins} Xu`);
-    return res.json({
-      success: true,
-      earnedCoins,
-      totalCoins: updatedUser.coins,
-      message: `Điểm danh thành công! Bạn nhận được ${earnedCoins} Xu từ hệ thống VNnettruyen.`
-    });
-  } catch (err) {
-    logger.error('Lỗi điểm danh:', err);
-    return res.status(500).json({ success: false, message: 'Lỗi máy chủ khi điểm danh.' });
-  }
+  return res.json({
+    success: true,
+    message: 'Chào mừng bạn đã truy cập diễn đàn VNnettruyen hôm nay!'
+  });
 };
