@@ -1,0 +1,43 @@
+<%- include('../../partials/header') %>
+
+<div style="max-width: 900px; margin: 30px auto;">
+  <div class="section-header" style="margin-bottom: 24px;">
+    <h1 class="section-title">➕ Viết Chương Mới: <%= story.title %></h1>
+  </div>
+
+  <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 30px;">
+    <form action="/author/stories/<%= story.id %>/chapters/create" method="POST">
+      <div style="display: grid; grid-template-columns: 140px 1fr; gap: 16px;">
+        <div class="form-group">
+          <label class="form-label">Số chương <span style="color: var(--danger);">*</span></label>
+          <input type="number" name="chapter_number" class="form-control" value="<%= suggestedNum %>" required min="1">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tiêu đề chương <span style="color: var(--danger);">*</span></label>
+          <input type="text" name="title" class="form-control" placeholder="Ví dụ: Đại chiến bến Bạch Đằng..." required autofocus>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nội dung chương truyện <span style="color: var(--danger);">*</span></label>
+        <textarea name="content" class="form-control" rows="18" placeholder="Nhập toàn bộ nội dung diễn biến của chương tại đây..." required style="line-height: 1.8; font-size: 1rem;"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Trạng thái xuất bản</label>
+        <select name="status" class="form-control" style="max-width: 250px;">
+          <option value="published">Xuất bản công khai ngay</option>
+          <option value="draft">Lưu làm bản nháp (Draft)</option>
+        </select>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 24px;">
+        <button type="submit" class="btn btn-primary btn-lg">Xuất Bản Chương</button>
+        <a href="/author/stories/<%= story.id %>/chapters" class="btn btn-secondary btn-lg">Quay lại danh sách</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('../../partials/footer') %>

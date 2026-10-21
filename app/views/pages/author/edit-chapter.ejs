@@ -1,0 +1,43 @@
+<%- include('../../partials/header') %>
+
+<div style="max-width: 900px; margin: 30px auto;">
+  <div class="section-header" style="margin-bottom: 24px;">
+    <h1 class="section-title">✏️ Chỉnh Sửa Chương: <%= chapter.title %></h1>
+  </div>
+
+  <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 30px;">
+    <form action="/author/stories/<%= story.id %>/chapters/<%= chapter.id %>/edit" method="POST">
+      <div style="display: grid; grid-template-columns: 140px 1fr; gap: 16px;">
+        <div class="form-group">
+          <label class="form-label">Số chương <span style="color: var(--danger);">*</span></label>
+          <input type="number" name="chapter_number" class="form-control" value="<%= chapter.chapter_number %>" required min="1">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tiêu đề chương <span style="color: var(--danger);">*</span></label>
+          <input type="text" name="title" class="form-control" value="<%= chapter.title %>" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nội dung chương truyện <span style="color: var(--danger);">*</span></label>
+        <textarea name="content" class="form-control" rows="18" required style="line-height: 1.8; font-size: 1rem;"><%= chapter.content %></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Trạng thái xuất bản</label>
+        <select name="status" class="form-control" style="max-width: 250px;">
+          <option value="published" <%= chapter.status === 'published' ? 'selected' : '' %>>Xuất bản công khai</option>
+          <option value="draft" <%= chapter.status === 'draft' ? 'selected' : '' %>>Lưu làm bản nháp (Draft)</option>
+        </select>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 24px;">
+        <button type="submit" class="btn btn-primary btn-lg">Lưu Cập Nhật</button>
+        <a href="/author/stories/<%= story.id %>/chapters" class="btn btn-secondary btn-lg">Quay lại danh sách</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('../../partials/footer') %>

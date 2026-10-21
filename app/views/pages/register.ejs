@@ -1,0 +1,48 @@
+<%- include('../partials/header') %>
+
+<div class="auth-wrapper">
+  <div class="auth-header">
+    <h2>📝 Đăng Ký Tài Khoản</h2>
+    <p>Gia nhập cộng đồng người đọc & sáng tác truyện Việt Nam</p>
+  </div>
+
+  <form action="/auth/register" method="POST">
+    <div class="form-group">
+      <label class="form-label">Tên tài khoản (Username)</label>
+      <input type="text" name="username" class="form-control" placeholder="Từ 3-30 ký tự, không dấu..." required minlength="3" maxlength="30" autofocus>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Địa chỉ Email</label>
+      <input type="email" name="email" class="form-control" placeholder="example@vnnettruyen.vn" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Mật khẩu</label>
+      <input type="password" name="password" class="form-control" placeholder="Tối thiểu 6 ký tự..." required minlength="6">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Xác nhận mật khẩu</label>
+      <input type="password" name="confirmPassword" class="form-control" placeholder="Nhập lại mật khẩu..." required minlength="6">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Mục đích tham gia</label>
+      <select name="role" class="form-control">
+        <option value="reader">📖 Độc giả (Đọc truyện, lưu tủ sách, bình luận)</option>
+        <option value="author">✍️ Tác giả (Có thể sáng tác truyện và quản lý chương)</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+      Đăng Ký Tài Khoản
+    </button>
+  </form>
+
+  <div style="margin-top: 24px; text-align: center; font-size: 0.9rem; color: var(--text-secondary);">
+    Đã có tài khoản? <a href="/auth/login" style="color: var(--accent-secondary); font-weight: 600;">Đăng nhập ngay</a>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

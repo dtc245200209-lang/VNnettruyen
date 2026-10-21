@@ -1,0 +1,53 @@
+<%- include('../../partials/header') %>
+
+<div style="max-width: 800px; margin: 30px auto;">
+  <div class="section-header" style="margin-bottom: 24px;">
+    <h1 class="section-title">➕ Đăng Tác Phẩm Truyện Mới</h1>
+  </div>
+
+  <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 30px;">
+    <form action="/author/stories/create" method="POST">
+      <div class="form-group">
+        <label class="form-label">Tên truyện <span style="color: var(--danger);">*</span></label>
+        <input type="text" name="title" class="form-control" placeholder="Nhập tên truyện hấp dẫn..." required autofocus>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Thể loại (Có thể chọn nhiều)</label>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; padding: 12px; background-color: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <% genres.forEach(g => { %>
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 0.88rem; cursor: pointer;">
+              <input type="checkbox" name="genre_ids" value="<%= g.id %>">
+              <span><%= g.name %></span>
+            </label>
+          <% }) %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tóm tắt giới thiệu truyện <span style="color: var(--danger);">*</span></label>
+        <textarea name="description" class="form-control" rows="6" placeholder="Mô tả bối cảnh, nhân vật chính, cốt truyện kịch tính..." required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Đường dẫn ảnh bìa (Cover Image URL)</label>
+        <input type="text" name="cover_image" class="form-control" placeholder="/public/images/default-cover.png hoặc link ảnh online">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Trạng thái phát hành</label>
+        <select name="status" class="form-control" style="max-width: 250px;">
+          <option value="ongoing">Đang tiến hành sáng tác (Ongoing)</option>
+          <option value="completed">Đã hoàn thành toàn văn (Completed)</option>
+        </select>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 24px;">
+        <button type="submit" class="btn btn-primary btn-lg">Tạo Tác Phẩm</button>
+        <a href="/author" class="btn btn-secondary btn-lg">Hủy bỏ</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('../../partials/footer') %>

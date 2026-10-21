@@ -1,0 +1,19 @@
+<%- include('../partials/header') %>
+
+<div style="text-align: center; padding: 80px 20px; max-width: 600px; margin: 0 auto;">
+  <div style="font-size: 5rem; font-weight: 800; color: var(--accent-primary); line-height: 1;">
+    <%= typeof statusCode !== 'undefined' ? statusCode : '500' %>
+  </div>
+  <h1 style="font-size: 1.8rem; margin: 16px 0; color: var(--text-primary);">
+    <%= typeof title !== 'undefined' ? title : 'Đã có lỗi xảy ra' %>
+  </h1>
+  <p style="color: var(--text-secondary); font-size: 1rem; margin-bottom: 28px; line-height: 1.6;">
+    <%= typeof message !== 'undefined' ? message : 'Hệ thống gặp sự cố trong quá trình xử lý.' %>
+  </p>
+  <div style="display: flex; gap: 12px; justify-content: center;">
+    <a href="/" class="btn btn-primary">Quay về Trang chủ</a>
+    <a href="/stories" class="btn btn-secondary">Khám phá truyện</a>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

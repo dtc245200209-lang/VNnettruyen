@@ -1,0 +1,35 @@
+# ==========================================
+# Prometheus Configuration for VNnettruyen
+# ==========================================
+
+global:
+  scrape_interval: 10s
+  evaluation_interval: 10s
+
+scrape_configs:
+  # 1. Scrape metrics từ ứng dụng Node.js VNnettruyen
+  - job_name: 'vnnettruyen-webapp'
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['webapp:3000']
+        labels:
+          environment: 'production'
+          service: 'vnnettruyen-app'
+
+  # 2. Scrape metrics của chính Prometheus
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # 3. Scrape metrics container từ cAdvisor
+  - job_name: 'cadvisor'
+    scrape_interval: 10s
+    static_configs:
+      - targets: ['cadvisor:8080']
+
+  # 4. Scrape metrics hệ thống từ Node Exporter
+  - job_name: 'node-exporter'
+    scrape_interval: 10s
+    static_configs:
+      - targets: ['node-exporter:9100']

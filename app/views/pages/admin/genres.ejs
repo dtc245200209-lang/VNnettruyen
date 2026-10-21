@@ -1,0 +1,76 @@
+<%- include('../../partials/header') %>
+
+<div style="margin: 30px 0;">
+  <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
+    <a href="/admin">Quản trị</a> &gt; <strong style="color: var(--text-primary);">Quản lý Thể Loại</strong>
+  </div>
+
+  <div class="main-layout" style="grid-template-columns: 1fr 340px;">
+    <!-- Left Column: Genres List -->
+    <div>
+      <div class="section-header" style="margin-bottom: 20px;">
+        <h1 class="section-title">🏷️ Danh Mục Thể Loại Truyện (<%= genres ? genres.length : 0 %>)</h1>
+      </div>
+
+      <div class="data-table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Tên thể loại</th>
+              <th>Slug</th>
+              <th>Mô tả</th>
+              <th>Số truyện</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (genres && genres.length > 0) { %>
+              <% genres.forEach(g => { %>
+                <tr>
+                  <td><%= g.id %></td>
+                  <td><strong><%= g.name %></strong></td>
+                  <td><code><%= g.slug %></code></td>
+                  <td style="font-size: 0.85rem; color: var(--text-secondary); max-width: 250px;"><%= g.description || 'Không có' %></td>
+                  <td><strong><%= g.story_count %></strong> tác phẩm</td>
+                  <td>
+                    <form action="/admin/genres/<%= g.id %>/delete" method="POST" class="confirm-delete" data-confirm-message="Bạn có chắc muốn xóa thể loại '<%= g.name %>'?">
+                      <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Chưa có thể loại nào.</td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Right Column: Create Genre Form -->
+    <div>
+      <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
+        <h3 class="widget-title">➕ Thêm Thể Loại Mới</h3>
+
+        <form action="/admin/genres" method="POST">
+          <div class="form-group">
+            <label class="form-label">Tên thể loại <span style="color: var(--danger);">*</span></label>
+            <input type="text" name="name" class="form-control" placeholder="Ví dụ: Đô Thị, Huyền Bí..." required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mô tả thể loại</label>
+            <textarea name="description" class="form-control" rows="4" placeholder="Giới thiệu đặc điểm của thể loại này..."></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Tạo Thể Loại</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../../partials/footer') %>

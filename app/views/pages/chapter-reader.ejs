@@ -1,0 +1,147 @@
+<%- include('../partials/header') %>
+
+<div style="margin: 20px 0;">
+  <!-- Breadcrumbs -->
+  <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+    <a href="/">Trang chủ</a> &gt; 
+    <a href="/stories/<%= story.slug %>"><%= story.title %></a> &gt; 
+    <span style="color: var(--text-primary);"><%= chapter.title %></span>
+  </div>
+
+  <div class="reader-wrapper">
+    <!-- Reader Header -->
+    <div class="reader-header">
+      <div class="reader-story-title">
+        <a href="/stories/<%= story.slug %>">📚 <%= story.title %></a>
+      </div>
+      <h1 class="reader-chapter-title"><%= chapter.title %></h1>
+      <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">
+        Cập nhật: <%= new Date(chapter.updated_at).toLocaleDateString('vi-VN') %>
+      </div>
+
+      <!-- Controls & Quick Navigation -->
+      <div class="reader-controls">
+        <!-- Prev Chapter -->
+        <% if (prevChapter) { %>
+          <a href="/stories/<%= story.slug %>/chapters/<%= prevChapter.chapter_number %>" class="btn btn-secondary btn-sm">
+            &larr; Chương trước
+          </a>
+        <% } else { %>
+          <button class="btn btn-secondary btn-sm" disabled>&larr; Chương trước</button>
+        <% } %>
+
+        <!-- Chapter Selector -->
+        <select onchange="window.location.href='/stories/<%= story.slug %>/chapters/' + this.value" class="form-control" style="width: auto; padding: 6px 12px; font-size: 0.85rem;">
+          <% allChapters.forEach(c => { %>
+            <option value="<%= c.chapter_number %>" <%= c.chapter_number === chapter.chapter_number ? 'selected' : '' %>>
+              Chương <%= c.chapter_number %>: <%= c.title %>
+            </option>
+          <% }) %>
+        </select>
+
+        <!-- Next Chapter -->
+        <% if (nextChapter) { %>
+          <a href="/stories/<%= story.slug %>/chapters/<%= nextChapter.chapter_number %>" class="btn btn-secondary btn-sm">
+            Chương sau &rarr;
+          </a>
+        <% } else { %>
+          <button class="btn btn-secondary btn-sm" disabled>Chương sau &rarr;</button>
+        <% } %>
+
+        <!-- Font Size & Theme -->
+        <div style="display: flex; gap: 6px; align-items: center; margin-left: 10px;">
+          <button id="btn-font-decrease" class="btn btn-secondary btn-sm" title="Giảm cỡ chữ">A-</button>
+          <button id="btn-font-increase" class="btn btn-secondary btn-sm" title="Tăng cỡ chữ">A+</button>
+          <select id="reader-theme-select" class="form-control" style="width: auto; padding: 6px 10px; font-size: 0.85rem;">
+            <option value="dark">🌙 Tối</option>
+            <option value="sepia">📜 Giấy cũ</option>
+            <option value="light">☀️ Sáng</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chapter Content -->
+    <div id="chapter-reader-content" class="reader-content">
+<%= chapter.content %>
+    </div>
+
+    <!-- Reader Footer Navigation -->
+    <div class="reader-footer-nav">
+      <% if (prevChapter) { %>
+        <a href="/stories/<%= story.slug %>/chapters/<%= prevChapter.chapter_number %>" class="btn btn-secondary">
+          &larr; Chương <%= prevChapter.chapter_number %>
+        </a>
+      <% } else { %>
+        <div></div>
+      <% } %>
+
+      <a href="/stories/<%= story.slug %>" class="btn btn-primary">
+        📑 Mục lục truyện
+      </a>
+
+      <% if (nextChapter) { %>
+        <a href="/stories/<%= story.slug %>/chapters/<%= nextChapter.chapter_number %>" class="btn btn-secondary">
+          Chương <%= nextChapter.chapter_number %> &rarr;
+        </a>
+      <% } else { %>
+        <div></div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Chapter Specific Comments -->
+  <div class="comment-section" style="max-width: 860px; margin: 30px auto;">
+    <div class="section-header" style="margin-bottom: 18px;">
+      <h3 class="section-title">💬 Bình luận chương <%= chapter.chapter_number %> (<%= comments ? comments.length : 0 %>)</h3>
+    </div>
+
+    <% if (currentUser) { %>
+      <form action="/comments" method="POST" class="comment-input-box">
+        <input type="hidden" name="story_id" value="<%= story.id %>">
+        <input type="hidden" name="chapter_id" value="<%= chapter.id %>">
+        <textarea name="content" placeholder="Bình luận về diễn biến của chương này..." required maxlength="1000"></textarea>
+        <div style="display: flex; justify-content: flex-end;">
+          <button type="submit" class="btn btn-primary">Gửi bình luận</button>
+        </div>
+      </form>
+    <% } else { %>
+      <div style="background-color: var(--bg-secondary); border: 1px dashed var(--border-color); padding: 16px; border-radius: var(--radius-md); text-align: center;">
+        Vui lòng <a href="/auth/login" style="color: var(--accent-secondary); font-weight: 600;">đăng nhập</a> để bình luận.
+      </div>
+    <% } %>
+
+    <div class="comment-list">
+      <% if (comments && comments.length > 0) { %>
+        <% comments.forEach(cmt => { %>
+          <div class="comment-card">
+            <div class="comment-header">
+              <div class="comment-author-info">
+                <img src="<%= cmt.avatar %>" alt="<%= cmt.username %>" class="user-avatar-sm" onerror="this.src='/public/images/default-avatar.png'">
+                <div>
+                  <strong><%= cmt.username %></strong>
+                  <span class="badge badge-<%= cmt.role %>" style="margin-left: 6px;"><%= cmt.role %></span>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span class="comment-time"><%= new Date(cmt.created_at).toLocaleString('vi-VN') %></span>
+                <% if (currentUser && (currentUser.id === cmt.user_id || currentUser.role === 'admin')) { %>
+                  <form action="/comments/<%= cmt.id %>/delete" method="POST" class="confirm-delete" data-confirm-message="Bạn có chắc chắn muốn xóa bình luận này?">
+                    <button type="submit" style="background: none; border: none; color: var(--danger); cursor: pointer; font-size: 0.8rem;">🗑️ Xóa</button>
+                  </form>
+                <% } %>
+              </div>
+            </div>
+            <div class="comment-body"><%= cmt.content %></div>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <div style="text-align: center; color: var(--text-muted); padding: 20px;">
+          Chưa có bình luận nào cho chương này. Hãy để lại ý kiến đầu tiên!
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,40 @@
+<%- include('../partials/header') %>
+
+<div class="auth-wrapper">
+  <div class="auth-header">
+    <h2>🔐 Đăng Nhập</h2>
+    <p>Chào mừng bạn trở lại với cộng đồng VNnettruyen</p>
+  </div>
+
+  <form action="/auth/login" method="POST">
+    <input type="hidden" name="redirect" value="<%= redirect %>">
+
+    <div class="form-group">
+      <label class="form-label">Tài khoản hoặc Email</label>
+      <input type="text" name="account" class="form-control" placeholder="Nhập username hoặc email..." required autofocus>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Mật khẩu</label>
+      <input type="password" name="password" class="form-control" placeholder="Nhập mật khẩu..." required>
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+      Đăng Nhập
+    </button>
+  </form>
+
+  <div style="margin-top: 24px; text-align: center; font-size: 0.9rem; color: var(--text-secondary);">
+    Chưa có tài khoản? <a href="/auth/register" style="color: var(--accent-secondary); font-weight: 600;">Đăng ký ngay</a>
+  </div>
+
+  <!-- Test Accounts Helper Box -->
+  <div style="margin-top: 30px; padding: 14px; background-color: var(--bg-secondary); border: 1px dashed var(--border-color); border-radius: var(--radius-md); font-size: 0.8rem; line-height: 1.6;">
+    <strong style="color: var(--warning);">📌 Tài khoản kiểm thử có sẵn:</strong><br>
+    • <strong>Quản trị viên:</strong> <code>admin</code> | <code>Admin@123456</code><br>
+    • <strong>Tác giả:</strong> <code>tacgia_viet</code> | <code>Author@123456</code><br>
+    • <strong>Độc giả:</strong> <code>docgia_vn</code> | <code>Reader@123456</code>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

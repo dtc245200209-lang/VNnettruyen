@@ -1,0 +1,53 @@
+<%- include('../../partials/header') %>
+
+<div style="max-width: 800px; margin: 30px auto;">
+  <div class="section-header" style="margin-bottom: 24px;">
+    <h1 class="section-title">✏️ Chỉnh Sửa Tác Phẩm: <%= story.title %></h1>
+  </div>
+
+  <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 30px;">
+    <form action="/author/stories/<%= story.id %>/edit" method="POST">
+      <div class="form-group">
+        <label class="form-label">Tên truyện <span style="color: var(--danger);">*</span></label>
+        <input type="text" name="title" class="form-control" value="<%= story.title %>" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Thể loại</label>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; padding: 12px; background-color: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <% genres.forEach(g => { %>
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 0.88rem; cursor: pointer;">
+              <input type="checkbox" name="genre_ids" value="<%= g.id %>" <%= selectedIds.includes(g.id) ? 'checked' : '' %>>
+              <span><%= g.name %></span>
+            </label>
+          <% }) %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tóm tắt giới thiệu truyện <span style="color: var(--danger);">*</span></label>
+        <textarea name="description" class="form-control" rows="6" required><%= story.description %></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Đường dẫn ảnh bìa (Cover Image URL)</label>
+        <input type="text" name="cover_image" class="form-control" value="<%= story.cover_image %>">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Trạng thái phát hành</label>
+        <select name="status" class="form-control" style="max-width: 250px;">
+          <option value="ongoing" <%= story.status === 'ongoing' ? 'selected' : '' %>>Đang tiến hành sáng tác (Ongoing)</option>
+          <option value="completed" <%= story.status === 'completed' ? 'selected' : '' %>>Đã hoàn thành toàn văn (Completed)</option>
+        </select>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 24px;">
+        <button type="submit" class="btn btn-primary btn-lg">Cập Nhật Truyện</button>
+        <a href="/author" class="btn btn-secondary btn-lg">Quay lại</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('../../partials/footer') %>

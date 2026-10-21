@@ -1,0 +1,202 @@
+# ==============================================================================
+# VNnettruyen - Hệ Thống Đọc và Sáng Tác Truyện Việt Nam
+# Docker Compose Orchestration: Webapp, MySQL, phpMyAdmin, Nginx, Prometheus, Grafana, Loki, Promtail
+# ==============================================================================
+
+services:
+  # 1. Cơ sở dữ liệu nội bộ MySQL (Database)
+  mysql:
+    image: mysql:8.0.36
+    container_name: vnnettruyen-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-VNnet_RootPass_2026!}
+      MYSQL_DATABASE: ${DB_NAME:-vnnettruyen_db}
+      MYSQL_USER: ${DB_USER:-vnnettruyen_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-VNnet_DbPass_2026!}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - backend_net
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 25s
+    # Hardening: Không expose port 3306 ra ngoài Internet
+
+  # 2. Ứng dụng Web Node.js + Express (Webapp)
+  webapp:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: vnnettruyen-webapp
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3000
+      SESSION_SECRET: ${SESSION_SECRET:-vnnettruyen_secure_session_secret_2026}
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-vnnettruyen_db}
+      DB_USER: ${DB_USER:-vnnettruyen_user}
+      DB_PASSWORD: ${DB_PASSWORD:-VNnet_DbPass_2026!}
+    volumes:
+      - app_logs:/usr/src/app/logs
+    networks:
+      - backend_net
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # 3. Nginx Reverse Proxy (HTTPS / HTTP Gateway)
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: vnnettruyen-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - nginx_logs:/var/log/nginx
+    networks:
+      - backend_net
+    depends_on:
+      webapp:
+        condition: service_healthy
+
+  # 4. phpMyAdmin (Quản trị Database)
+  phpmyadmin:
+    image: phpmyadmin:5.2.1-apache
+    container_name: vnnettruyen-phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 64M
+    ports:
+      - "${PMA_PORT:-8080}:80"
+    networks:
+      - backend_net
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  # 5. Prometheus (Giám sát Metrics)
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    container_name: vnnettruyen-prometheus
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - backend_net
+
+  # 6. Grafana (Dashboard Trực quan hóa)
+  grafana:
+    image: grafana/grafana:10.4.1
+    container_name: vnnettruyen-grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GF_SECURITY_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD:-VNnet_GrafanaPass_2026!}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "${GRAFANA_PORT:-3001}:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    networks:
+      - backend_net
+    depends_on:
+      - prometheus
+      - loki
+
+  # 7. Loki (Thu thập & Lưu trữ Log tập trung)
+  loki:
+    image: grafana/loki:3.0.0
+    container_name: vnnettruyen-loki
+    restart: unless-stopped
+    command: -config.file=/etc/loki/local-config.yaml
+    ports:
+      - "${LOKI_PORT:-3100}:3100"
+    volumes:
+      - ./loki/loki-config.yaml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki
+    networks:
+      - backend_net
+
+  # 8. Promtail (Thu thập Log container chuyển tới Loki)
+  promtail:
+    image: grafana/promtail:3.0.0
+    container_name: vnnettruyen-promtail
+    restart: unless-stopped
+    command: -config.file=/etc/promtail/config.yml
+    volumes:
+      - ./promtail/promtail-config.yaml:/etc/promtail/config.yml:ro
+      - nginx_logs:/var/log/nginx:ro
+      - app_logs:/var/log/app:ro
+    networks:
+      - backend_net
+    depends_on:
+      - loki
+
+  # 9. Node Exporter (Tài nguyên phần cứng hệ thống)
+  node-exporter:
+    image: prom/node-exporter:v1.7.0
+    container_name: vnnettruyen-node-exporter
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+    networks:
+      - backend_net
+
+  # 10. cAdvisor (Giám sát tài nguyên Container)
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: vnnettruyen-cadvisor
+    restart: unless-stopped
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    networks:
+      - backend_net
+
+networks:
+  backend_net:
+    driver: bridge
+    name: vnnettruyen_backend_net
+
+volumes:
+  mysql_data:
+    name: vnnettruyen_mysql_data
+  prometheus_data:
+    name: vnnettruyen_prometheus_data
+  grafana_data:
+    name: vnnettruyen_grafana_data
+  loki_data:
+    name: vnnettruyen_loki_data
+  app_logs:
+    name: vnnettruyen_app_logs
+  nginx_logs:
+    name: vnnettruyen_nginx_logs

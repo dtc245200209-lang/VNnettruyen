@@ -1,0 +1,124 @@
+<%- include('../partials/header') %>
+
+<!-- 1. Featured Stories Hero -->
+<section class="hero-section">
+  <div class="section-header">
+    <h2 class="section-title">⭐ Tác Phẩm Nổi Bật</h2>
+    <a href="/stories?sort=views" class="section-link">Xem tất cả &rarr;</a>
+  </div>
+
+  <div class="story-grid">
+    <% if (featuredStories && featuredStories.length > 0) { %>
+      <% featuredStories.forEach(story => { %>
+        <div class="story-card">
+          <div class="story-cover-wrap">
+            <a href="/stories/<%= story.slug %>">
+              <img src="<%= story.cover_image %>" alt="<%= story.title %>" class="story-cover" onerror="this.src='/public/images/default-cover.png'">
+            </a>
+            <span class="story-badge">⭐ Hot</span>
+          </div>
+          <div class="story-info">
+            <a href="/stories/<%= story.slug %>">
+              <h3 class="story-title" title="<%= story.title %>"><%= story.title %></h3>
+            </a>
+            <div class="story-author">Tác giả: <strong><%= story.author_name %></strong></div>
+            <div class="story-meta">
+              <span>📖 <%= story.total_chapters %> chương</span>
+              <span>👁️ <%= story.views %></span>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <div style="grid-column: 1 / -1; padding: 30px; text-align: center; color: var(--text-muted);">
+        Chưa có truyện nổi bật nào được thiết lập.
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<!-- 2. Main Layout: Latest Updates + Sidebar -->
+<div class="main-layout">
+  <!-- Left Column: Latest Stories -->
+  <section>
+    <div class="section-header">
+      <h2 class="section-title">🔥 Truyện Mới Cập Nhật</h2>
+      <a href="/stories?sort=latest" class="section-link">Xem thêm &rarr;</a>
+    </div>
+
+    <div class="story-grid">
+      <% if (latestStories && latestStories.length > 0) { %>
+        <% latestStories.forEach(story => { %>
+          <div class="story-card">
+            <div class="story-cover-wrap">
+              <a href="/stories/<%= story.slug %>">
+                <img src="<%= story.cover_image %>" alt="<%= story.title %>" class="story-cover" onerror="this.src='/public/images/default-cover.png'">
+              </a>
+              <span class="story-badge <%= story.status === 'completed' ? 'badge-completed' : 'badge-ongoing' %>">
+                <%= story.status === 'completed' ? 'Hoàn thành' : 'Đang ra' %>
+              </span>
+            </div>
+            <div class="story-info">
+              <a href="/stories/<%= story.slug %>">
+                <h3 class="story-title" title="<%= story.title %>"><%= story.title %></h3>
+              </a>
+              <div class="story-author">Tác giả: <%= story.author_name %></div>
+              
+              <% if (story.latest_chapter_number) { %>
+                <div style="font-size: 0.8rem; margin-bottom: 6px;">
+                  <a href="/stories/<%= story.slug %>/chapters/<%= story.latest_chapter_number %>" style="color: var(--accent-secondary);">
+                    Chương <%= story.latest_chapter_number %>
+                  </a>
+                </div>
+              <% } %>
+
+              <div class="story-meta">
+                <span><%= story.genres_list ? story.genres_list.split(',')[0] : 'Văn học' %></span>
+                <span>👁️ <%= story.views %></span>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <div style="grid-column: 1 / -1; padding: 40px; text-align: center; color: var(--text-muted);">
+          Hiện tại chưa có truyện nào được đăng tải.
+        </div>
+      <% } %>
+    </div>
+  </section>
+
+  <!-- Right Column: Sidebar -->
+  <aside>
+    <!-- Top Ranking -->
+    <div class="sidebar-widget">
+      <h3 class="widget-title">🏆 Top Đọc Nhiều Nhất</h3>
+      <ul class="top-ranking-list">
+        <% if (topStories && topStories.length > 0) { %>
+          <% topStories.forEach((story, idx) => { %>
+            <li class="top-ranking-item">
+              <span class="ranking-number"><%= idx + 1 %></span>
+              <div class="ranking-info">
+                <h4><a href="/stories/<%= story.slug %>"><%= story.title %></a></h4>
+                <span>👁️ <%= story.views %> lượt xem • <%= story.total_chapters %> chương</span>
+              </div>
+            </li>
+          <% }) %>
+        <% } %>
+      </ul>
+    </div>
+
+    <!-- Genres -->
+    <div class="sidebar-widget">
+      <h3 class="widget-title">🏷️ Khám Phá Thể Loại</h3>
+      <div class="genre-tags">
+        <% if (genres && genres.length > 0) { %>
+          <% genres.forEach(g => { %>
+            <a href="/stories?genre=<%= g.slug %>" class="genre-tag"><%= g.name %></a>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<%- include('../partials/footer') %>

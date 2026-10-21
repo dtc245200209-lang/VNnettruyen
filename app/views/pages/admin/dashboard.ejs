@@ -1,0 +1,120 @@
+<%- include('../../partials/header') %>
+
+<div style="margin: 30px 0;">
+  <!-- Admin Navigation Bar -->
+  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+    <div>
+      <h1 class="section-title">🛡️ Bảng Điều Khiển Quản Trị Hệ Thống</h1>
+      <p style="color: var(--text-secondary); font-size: 0.9rem;">VNnettruyen Administration & System Overview</p>
+    </div>
+
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <a href="/admin/users" class="btn btn-secondary btn-sm">👥 Người dùng</a>
+      <a href="/admin/stories" class="btn btn-secondary btn-sm">📚 Truyện</a>
+      <a href="/admin/genres" class="btn btn-secondary btn-sm">🏷️ Thể loại</a>
+      <a href="/admin/comments" class="btn btn-secondary btn-sm">💬 Bình luận</a>
+    </div>
+  </div>
+
+  <!-- Statistics Grid -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">👥</div>
+      <div class="stat-info">
+        <h3><%= stats.users %></h3>
+        <p>Tổng người dùng</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="color: var(--accent-primary); background-color: rgba(225, 29, 72, 0.15);">📚</div>
+      <div class="stat-info">
+        <h3><%= stats.stories %></h3>
+        <p>Tác phẩm truyện</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="color: var(--success); background-color: rgba(16, 185, 129, 0.15);">📑</div>
+      <div class="stat-info">
+        <h3><%= stats.chapters %></h3>
+        <p>Tổng số chương</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="color: var(--warning); background-color: rgba(245, 158, 11, 0.15);">💬</div>
+      <div class="stat-info">
+        <h3><%= stats.comments %></h3>
+        <p>Bình luận cộng đồng</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Infrastructure Monitoring Shortcuts -->
+  <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; margin-bottom: 30px;">
+    <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 12px; color: var(--accent-secondary);">
+      📊 Cổng Quản Trị Hạ Tầng & Giám Sát (DevOps Observability)
+    </h3>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+      <a href="http://localhost:3001" target="_blank" class="btn btn-secondary btn-sm">📈 Grafana Dashboard (:3001)</a>
+      <a href="http://localhost:9090/targets" target="_blank" class="btn btn-secondary btn-sm">🎯 Prometheus Targets (:9090)</a>
+      <a href="http://localhost:8080" target="_blank" class="btn btn-secondary btn-sm">🗄️ phpMyAdmin Database (:8080)</a>
+      <a href="/metrics" target="_blank" class="btn btn-secondary btn-sm">⚡ App Metrics (/metrics)</a>
+      <a href="/health" target="_blank" class="btn btn-secondary btn-sm">🩺 Healthcheck (/health)</a>
+    </div>
+  </div>
+
+  <!-- Recent Activity Grids -->
+  <div class="main-layout" style="margin: 0;">
+    <!-- Recent Users -->
+    <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
+      <div class="section-header" style="margin-bottom: 16px;">
+        <h3 class="section-title" style="font-size: 1.1rem;">👤 Thành Viên Mới Nhất</h3>
+      </div>
+      <div class="data-table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Vai trò</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% recentUsers.forEach(u => { %>
+              <tr>
+                <td><strong><%= u.username %></strong></td>
+                <td style="font-size: 0.8rem; color: var(--text-muted);"><%= u.email %></td>
+                <td><span class="badge badge-<%= u.role %>"><%= u.role %></span></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Recent Comments -->
+    <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
+      <div class="section-header" style="margin-bottom: 16px;">
+        <h3 class="section-title" style="font-size: 1.1rem;">💬 Bình Luận Mới</h3>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <% recentComments.forEach(c => { %>
+          <div style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 0.85rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <strong><%= c.username %></strong>
+              <span style="color: var(--text-muted); font-size: 0.75rem;"><%= new Date(c.created_at).toLocaleDateString('vi-VN') %></span>
+            </div>
+            <div style="color: var(--text-secondary); margin-bottom: 4px;"><%= c.content.slice(0, 100) %></div>
+            <div style="font-size: 0.75rem; color: var(--accent-secondary);">
+              Tại: <a href="/stories/<%= c.story_slug %>"><%= c.story_title %></a>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../../partials/footer') %>

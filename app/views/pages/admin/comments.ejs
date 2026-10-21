@@ -1,0 +1,64 @@
+<%- include('../../partials/header') %>
+
+<div style="margin: 30px 0;">
+  <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
+    <a href="/admin">Quản trị</a> &gt; <strong style="color: var(--text-primary);">Quản lý Bình Luận</strong>
+  </div>
+
+  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+    <h1 class="section-title">💬 Kiểm Duyệt Bình Luận Toàn Hệ Thống (<%= comments ? comments.length : 0 %>)</h1>
+  </div>
+
+  <!-- Search -->
+  <form action="/admin/comments" method="GET" style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+    <input type="text" name="q" value="<%= q %>" placeholder="Tìm theo nội dung, người dùng, tên truyện..." class="form-control" style="max-width: 400px;">
+    <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+    <a href="/admin/comments" class="btn btn-secondary">Tất cả</a>
+  </form>
+
+  <div class="data-table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Người bình luận</th>
+          <th>Nội dung bình luận</th>
+          <th>Tác phẩm / Chương</th>
+          <th>Thời gian</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (comments && comments.length > 0) { %>
+          <% comments.forEach(c => { %>
+            <tr>
+              <td><%= c.id %></td>
+              <td><strong><%= c.username %></strong></td>
+              <td style="max-width: 350px; font-size: 0.9rem; line-height: 1.5;"><%= c.content %></td>
+              <td>
+                <a href="/stories/<%= c.story_slug %>" target="_blank" style="color: var(--accent-secondary); font-weight: 600;">
+                  <%= c.story_title %>
+                </a>
+                <% if (c.chapter_number) { %>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Chương <%= c.chapter_number %></div>
+                <% } %>
+              </td>
+              <td style="font-size: 0.8rem; color: var(--text-muted);"><%= new Date(c.created_at).toLocaleString('vi-VN') %></td>
+              <td>
+                <form action="/admin/comments/<%= c.id %>/delete" method="POST" class="confirm-delete" data-confirm-message="Bạn có chắc chắn muốn xóa bình luận này vì vi phạm quy chuẩn cộng đồng?">
+                  <button type="submit" class="btn btn-danger btn-sm">🗑️ Xóa</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 30px; color: var(--text-muted);">Không tìm thấy bình luận nào.</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../../partials/footer') %>

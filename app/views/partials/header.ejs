@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'VNnettruyen - Diễn Đàn Đọc và Sáng Tác Truyện Việt Nam' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body>
+
+  <!-- Header Navigation -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="/" class="nav-brand">
+        📚 <span>VNnet</span>truyen
+      </a>
+
+      <!-- Quick Search -->
+      <div class="nav-search">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="navbar-search-input" placeholder="Tìm kiếm truyện, tác giả..." autocomplete="off">
+        <div id="navbar-search-results" class="search-results-dropdown"></div>
+      </div>
+
+      <!-- Navigation Links -->
+      <ul class="nav-menu">
+        <li><a href="/" class="nav-link <%= currentPath === '/' ? 'active' : '' %>">Trang chủ</a></li>
+        <li><a href="/stories" class="nav-link <%= currentPath.startsWith('/stories') ? 'active' : '' %>">Khám phá</a></li>
+        
+        <% if (currentUser && (currentUser.role === 'author' || currentUser.role === 'admin')) { %>
+          <li><a href="/author" class="nav-link <%= currentPath.startsWith('/author') ? 'active' : '' %>">✍️ Sáng tác</a></li>
+        <% } %>
+
+        <% if (currentUser && currentUser.role === 'admin') { %>
+          <li><a href="/admin" class="nav-link <%= currentPath.startsWith('/admin') ? 'active' : '' %>">🛡️ Quản trị</a></li>
+        <% } %>
+      </ul>
+
+      <!-- User Actions -->
+      <div class="nav-actions">
+        <% if (currentUser) { %>
+          <a href="/profile" class="nav-link" style="display: flex; align-items: center; gap: 8px;">
+            <img src="<%= currentUser.avatar %>" alt="<%= currentUser.username %>" class="user-avatar-sm" onerror="this.src='/public/images/default-avatar.png'">
+            <span><%= currentUser.username %></span>
+            <span class="badge badge-<%= currentUser.role %>"><%= currentUser.role %></span>
+          </a>
+          <a href="/auth/logout" class="btn btn-secondary btn-sm">Đăng xuất</a>
+        <% } else { %>
+          <a href="/auth/login" class="btn btn-secondary btn-sm">Đăng nhập</a>
+          <a href="/auth/register" class="btn btn-primary btn-sm">Đăng ký</a>
+        <% } %>
+      </div>
+    </div>
+  </header>
+
+  <!-- Flash Messages -->
+  <div class="container" style="margin-top: 15px;">
+    <% if (success_msg && success_msg.length > 0) { %>
+      <div class="alert alert-success">
+        <span>✅</span>
+        <div><%= success_msg %></div>
+      </div>
+    <% } %>
+
+    <% if (error_msg && error_msg.length > 0) { %>
+      <div class="alert alert-error">
+        <span>⚠️</span>
+        <div><%= error_msg %></div>
+      </div>
+    <% } %>
+  </div>
+
+  <main class="container" style="flex: 1;">

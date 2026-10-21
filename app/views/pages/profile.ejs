@@ -1,0 +1,143 @@
+<%- include('../partials/header') %>
+
+<div style="margin: 30px 0;">
+  <!-- User Profile Header Card -->
+  <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 28px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 30px;">
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <img src="<%= profileUser.avatar %>" alt="<%= profileUser.username %>" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-secondary);" onerror="this.src='/public/images/default-avatar.png'">
+      <div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+          <h2 style="font-size: 1.5rem; font-weight: 800;"><%= profileUser.username %></h2>
+          <span class="badge badge-<%= profileUser.role %>"><%= profileUser.role %></span>
+        </div>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 4px;">📧 <%= profileUser.email %></p>
+        <p style="color: var(--text-muted); font-size: 0.8rem;">Tham gia từ: <%= new Date(profileUser.created_at).toLocaleDateString('vi-VN') %></p>
+      </div>
+    </div>
+
+    <div>
+      <% if (profileUser.role === 'author' || profileUser.role === 'admin') { %>
+        <a href="/author" class="btn btn-primary">✍️ Vào Studio Tác Giả</a>
+      <% } %>
+      <% if (profileUser.role === 'admin') { %>
+        <a href="/admin" class="btn btn-secondary">🛡️ Trang Quản Trị</a>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="main-layout">
+    <!-- Left Column: Bookshelf & History -->
+    <div>
+      <!-- 1. Tủ sách cá nhân (Favorites) -->
+      <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; margin-bottom: 24px;">
+        <div class="section-header" style="margin-bottom: 16px;">
+          <h3 class="section-title">❤️ Tủ Sách Yêu Thích (<%= favorites ? favorites.length : 0 %>)</h3>
+        </div>
+
+        <% if (favorites && favorites.length > 0) { %>
+          <div class="story-grid" style="grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));">
+            <% favorites.forEach(story => { %>
+              <div class="story-card">
+                <div class="story-cover-wrap">
+                  <a href="/stories/<%= story.slug %>">
+                    <img src="<%= story.cover_image %>" alt="<%= story.title %>" class="story-cover" onerror="this.src='/public/images/default-cover.png'">
+                  </a>
+                </div>
+                <div class="story-info">
+                  <a href="/stories/<%= story.slug %>">
+                    <h4 class="story-title" style="font-size: 0.85rem;"><%= story.title %></h4>
+                  </a>
+                  <div class="story-meta">
+                    <span>📖 <%= story.total_chapters %> ch</span>
+                    <form action="/bookmark/toggle" method="POST" style="display: inline;">
+                      <input type="hidden" name="storyId" value="<%= story.id %>">
+                      <button type="submit" style="background: none; border: none; color: var(--danger); cursor: pointer; font-size: 0.8rem;">Xóa</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <div style="padding: 30px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+            Tủ sách của bạn đang trống. Hãy bấm "Thêm vào tủ sách" ở truyện bạn yêu thích nhé!
+          </div>
+        <% } %>
+      </div>
+
+      <!-- 2. Lịch sử đọc gần đây -->
+      <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
+        <div class="section-header" style="margin-bottom: 16px;">
+          <h3 class="section-title">🕒 Lịch Sử Đọc Gần Đây</h3>
+        </div>
+
+        <% if (history && history.length > 0) { %>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Tác phẩm</th>
+                  <th>Chương đã đọc</th>
+                  <th>Thời gian</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% history.forEach(item => { %>
+                  <tr>
+                    <td><strong><%= item.story_title %></strong></td>
+                    <td>Chương <%= item.chapter_number %>: <%= item.chapter_title %></td>
+                    <td style="color: var(--text-muted); font-size: 0.8rem;"><%= new Date(item.read_at).toLocaleString('vi-VN') %></td>
+                    <td>
+                      <a href="/stories/<%= item.story_slug %>/chapters/<%= item.chapter_number %>" class="btn btn-secondary btn-sm">Đọc tiếp</a>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+            Chưa ghi nhận lịch sử đọc.
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Right Column: Settings & Password -->
+    <div>
+      <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
+        <h3 class="widget-title">⚙️ Cập Nhật Hồ Sơ</h3>
+        
+        <form action="/profile" method="POST">
+          <div class="form-group">
+            <label class="form-label">Tiểu sử (Bio)</label>
+            <textarea name="bio" class="form-control" rows="3" placeholder="Giới thiệu đôi nét về bản thân..."><%= profileUser.bio || '' %></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Đường dẫn ảnh đại diện (Avatar URL)</label>
+            <input type="text" name="avatar" class="form-control" value="<%= profileUser.avatar %>">
+          </div>
+
+          <hr style="border-color: var(--border-color); margin: 20px 0;">
+          <h4 style="font-size: 0.95rem; margin-bottom: 12px; color: var(--accent-secondary);">Đổi Mật Khẩu (Để trống nếu không đổi)</h4>
+
+          <div class="form-group">
+            <label class="form-label">Mật khẩu hiện tại</label>
+            <input type="password" name="currentPassword" class="form-control" placeholder="Nhập mật khẩu cũ...">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mật khẩu mới</label>
+            <input type="password" name="newPassword" class="form-control" placeholder="Mật khẩu mới (tối thiểu 6 ký tự)...">
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Lưu Thay Đổi</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,158 @@
+<%- include('../partials/header') %>
+
+<div style="margin: 25px 0;">
+  <!-- Breadcrumb -->
+  <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
+    <a href="/">Trang chủ</a> &gt; <a href="/stories">Truyện</a> &gt; <span style="color: var(--text-primary);"><%= story.title %></span>
+  </div>
+
+  <!-- Story Main Info -->
+  <div class="story-detail-card">
+    <div>
+      <img src="<%= story.cover_image %>" alt="<%= story.title %>" class="story-detail-cover" onerror="this.src='/public/images/default-cover.png'">
+    </div>
+
+    <div class="story-detail-info">
+      <h1><%= story.title %></h1>
+      
+      <div class="story-detail-meta">
+        <div>✍️ Tác giả: <strong><%= story.author_name %></strong></div>
+        <div>
+          🏷️ Thể loại: 
+          <% if (story.genre_names) { %>
+            <% const gNames = story.genre_names.split('||'); %>
+            <% const gSlugs = story.genre_slugs.split('||'); %>
+            <% gNames.forEach((name, i) => { %>
+              <a href="/stories?genre=<%= gSlugs[i] %>" class="genre-tag" style="margin-right: 4px;"><%= name %></a>
+            <% }) %>
+          <% } else { %>
+            <span style="color: var(--text-muted);">Đang cập nhật</span>
+          <% } %>
+        </div>
+        <div>
+          📌 Trạng thái: 
+          <span class="badge <%= story.status === 'completed' ? 'badge-completed' : 'badge-ongoing' %>">
+            <%= story.status === 'completed' ? 'Hoàn thành' : 'Đang ra' %>
+          </span>
+        </div>
+        <div>👁️ Lượt đọc: <strong><%= story.views %></strong></div>
+        <div>🕒 Cập nhật: <%= new Date(story.updated_at).toLocaleDateString('vi-VN') %></div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="story-detail-actions">
+        <% if (chapters && chapters.length > 0) { %>
+          <a href="/stories/<%= story.slug %>/chapters/<%= chapters[0].chapter_number %>" class="btn btn-primary">
+            📖 Đọc từ đầu (Chương 1)
+          </a>
+          <a href="/stories/<%= story.slug %>/chapters/<%= chapters[chapters.length - 1].chapter_number %>" class="btn btn-secondary">
+            ⏩ Đọc mới nhất (Chương <%= chapters[chapters.length - 1].chapter_number %>)
+          </a>
+        <% } else { %>
+          <button class="btn btn-secondary" disabled>Chưa có chương nào</button>
+        <% } %>
+
+        <% if (currentUser) { %>
+          <button id="btn-bookmark-toggle" data-story-id="<%= story.id %>" class="btn <%= isBookmarked ? 'btn-primary' : 'btn-secondary' %>">
+            <%= isBookmarked ? '❤️ Đã lưu vào tủ sách' : '🤍 Thêm vào tủ sách' %>
+          </button>
+        <% } else { %>
+          <a href="/auth/login" class="btn btn-secondary">🤍 Đăng nhập để lưu tủ sách</a>
+        <% } %>
+
+        <% if (currentUser && (currentUser.id === story.author_id || currentUser.role === 'admin')) { %>
+          <a href="/author/stories/<%= story.id %>/chapters" class="btn btn-accent">
+            ⚙️ Quản lý chương truyện
+          </a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Synopsis -->
+  <div class="story-synopsis">
+    <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 12px; color: var(--accent-secondary);">
+      📝 Tóm Tắt Nội Dung
+    </h3>
+    <p style="font-size: 0.95rem; line-height: 1.8; color: var(--text-primary); white-space: pre-line;">
+      <%= story.description %>
+    </p>
+  </div>
+
+  <!-- Chapters List -->
+  <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px; margin-bottom: 30px;">
+    <div class="section-header" style="margin-bottom: 16px;">
+      <h3 class="section-title">📑 Danh Sách Chương (<%= chapters ? chapters.length : 0 %>)</h3>
+    </div>
+
+    <% if (chapters && chapters.length > 0) { %>
+      <div class="chapter-list-grid">
+        <% chapters.forEach(chap => { %>
+          <a href="/stories/<%= story.slug %>/chapters/<%= chap.chapter_number %>" class="chapter-item">
+            <span>Chương <%= chap.chapter_number %>: <%= chap.title %></span>
+            <span style="font-size: 0.75rem; color: var(--text-muted);"><%= new Date(chap.created_at).toLocaleDateString('vi-VN') %></span>
+          </a>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <div style="padding: 24px; text-align: center; color: var(--text-muted);">
+        Tác giả đang chuẩn bị nội dung và sẽ ra mắt chương mới sớm nhất.
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Comments Section -->
+  <div class="comment-section">
+    <div class="section-header" style="margin-bottom: 20px;">
+      <h3 class="section-title">💬 Thảo Luận & Bình Luận (<%= comments ? comments.length : 0 %>)</h3>
+    </div>
+
+    <% if (currentUser) { %>
+      <form action="/comments" method="POST" class="comment-input-box">
+        <input type="hidden" name="story_id" value="<%= story.id %>">
+        <textarea name="content" placeholder="Chia sẻ cảm nghĩ của bạn về tác phẩm này..." required maxlength="1000"></textarea>
+        <div style="display: flex; justify-content: flex-end;">
+          <button type="submit" class="btn btn-primary">Gửi bình luận</button>
+        </div>
+      </form>
+    <% } else { %>
+      <div style="background-color: var(--bg-secondary); border: 1px dashed var(--border-color); padding: 16px; border-radius: var(--radius-md); text-align: center;">
+        Vui lòng <a href="/auth/login" style="color: var(--accent-secondary); font-weight: 600;">đăng nhập</a> để tham gia bình luận cùng cộng đồng.
+      </div>
+    <% } %>
+
+    <!-- Comment List -->
+    <div class="comment-list">
+      <% if (comments && comments.length > 0) { %>
+        <% comments.forEach(cmt => { %>
+          <div class="comment-card">
+            <div class="comment-header">
+              <div class="comment-author-info">
+                <img src="<%= cmt.avatar %>" alt="<%= cmt.username %>" class="user-avatar-sm" onerror="this.src='/public/images/default-avatar.png'">
+                <div>
+                  <strong><%= cmt.username %></strong>
+                  <span class="badge badge-<%= cmt.role %>" style="margin-left: 6px;"><%= cmt.role %></span>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span class="comment-time"><%= new Date(cmt.created_at).toLocaleString('vi-VN') %></span>
+                <% if (currentUser && (currentUser.id === cmt.user_id || currentUser.role === 'admin')) { %>
+                  <form action="/comments/<%= cmt.id %>/delete" method="POST" class="confirm-delete" data-confirm-message="Bạn có chắc chắn muốn xóa bình luận này?">
+                    <button type="submit" style="background: none; border: none; color: var(--danger); cursor: pointer; font-size: 0.8rem;">🗑️ Xóa</button>
+                  </form>
+                <% } %>
+              </div>
+            </div>
+            <div class="comment-body"><%= cmt.content %></div>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <div style="text-align: center; color: var(--text-muted); padding: 20px;">
+          Chưa có bình luận nào. Hãy là người đầu tiên để lại cảm nghĩ!
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

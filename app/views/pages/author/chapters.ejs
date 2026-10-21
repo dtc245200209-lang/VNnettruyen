@@ -1,0 +1,68 @@
+<%- include('../../partials/header') %>
+
+<div style="margin: 30px 0;">
+  <!-- Breadcrumb -->
+  <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
+    <a href="/author">Studio Tác Giả</a> &gt; <span>Quản lý chương</span> &gt; <strong style="color: var(--text-primary);"><%= story.title %></strong>
+  </div>
+
+  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+    <div>
+      <h1 class="section-title">📑 Danh Sách Chương: <%= story.title %></h1>
+      <p style="color: var(--text-secondary); font-size: 0.9rem;">Tổng số: <%= chapters ? chapters.length : 0 %> chương</p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+      <a href="/author/stories/<%= story.id %>/chapters/create" class="btn btn-primary">➕ Viết Chương Mới</a>
+      <a href="/stories/<%= story.slug %>" target="_blank" class="btn btn-secondary">👁️ Xem Trang Truyện</a>
+    </div>
+  </div>
+
+  <% if (chapters && chapters.length > 0) { %>
+    <div class="data-table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Số chương</th>
+            <th>Tiêu đề chương</th>
+            <th>Trạng thái</th>
+            <th>Ngày tạo</th>
+            <th>Cập nhật cuối</th>
+            <th>Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% chapters.forEach(chap => { %>
+            <tr>
+              <td><strong>Chương <%= chap.chapter_number %></strong></td>
+              <td><%= chap.title %></td>
+              <td>
+                <span class="badge <%= chap.status === 'published' ? 'badge-completed' : 'badge-ongoing' %>">
+                  <%= chap.status === 'published' ? 'Đã xuất bản' : 'Bản nháp' %>
+                </span>
+              </td>
+              <td style="font-size: 0.8rem; color: var(--text-muted);"><%= new Date(chap.created_at).toLocaleDateString('vi-VN') %></td>
+              <td style="font-size: 0.8rem; color: var(--text-muted);"><%= new Date(chap.updated_at).toLocaleDateString('vi-VN') %></td>
+              <td>
+                <div style="display: flex; gap: 6px;">
+                  <a href="/stories/<%= story.slug %>/chapters/<%= chap.chapter_number %>" target="_blank" class="btn btn-secondary btn-sm" title="Đọc thử">👁️</a>
+                  <a href="/author/stories/<%= story.id %>/chapters/<%= chap.id %>/edit" class="btn btn-secondary btn-sm" title="Sửa nội dung">✏️ Sửa</a>
+                  <form action="/author/stories/<%= story.id %>/chapters/<%= chap.id %>/delete" method="POST" class="confirm-delete" data-confirm-message="Bạn có chắc chắn muốn xóa chương này?">
+                    <button type="submit" class="btn btn-danger btn-sm" title="Xóa chương">🗑️</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } else { %>
+    <div style="background-color: var(--bg-card); border: 1px dashed var(--border-color); border-radius: var(--radius-lg); padding: 50px 20px; text-align: center;">
+      <h3 style="margin-bottom: 10px;">Truyện này chưa có chương nào</h3>
+      <p style="color: var(--text-muted); margin-bottom: 20px;">Hãy viết và xuất bản Chương 1 để bạn đọc có thể thưởng thức tác phẩm.</p>
+      <a href="/author/stories/<%= story.id %>/chapters/create" class="btn btn-primary">➕ Viết Chương 1 Ngay</a>
+    </div>
+  <% } %>
+</div>
+
+<%- include('../../partials/footer') %>

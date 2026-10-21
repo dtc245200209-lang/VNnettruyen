@@ -1,0 +1,27 @@
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment and secrets
+.env
+*.pem
+*.key
+*.cert
+
+# Log files
+logs/
+*.log
+app/logs/
+nginx/logs/
+
+# Docker volumes and local data
+data/
+mysql_data/
+grafana_data/
+loki_data/
+
+# OS files
+.DS_Store
+Thumbs.db

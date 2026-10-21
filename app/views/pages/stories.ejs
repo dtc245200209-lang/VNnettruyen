@@ -1,0 +1,116 @@
+<%- include('../partials/header') %>
+
+<div style="margin: 25px 0;">
+  <div class="section-header">
+    <h1 class="section-title">📚 Khám Phá Thư Viện Truyện</h1>
+  </div>
+
+  <!-- Filter Form -->
+  <form action="/stories" method="GET" style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px; margin-bottom: 30px; display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end;">
+    <!-- Keyword -->
+    <div style="flex: 2; min-width: 200px;">
+      <label class="form-label">Từ khóa</label>
+      <input type="text" name="q" value="<%= query.q %>" class="form-control" placeholder="Tên truyện hoặc tác giả...">
+    </div>
+
+    <!-- Genre -->
+    <div style="flex: 1; min-width: 150px;">
+      <label class="form-label">Thể loại</label>
+      <select name="genre" class="form-control">
+        <option value="">-- Tất cả thể loại --</option>
+        <% genres.forEach(g => { %>
+          <option value="<%= g.slug %>" <%= query.genre === g.slug ? 'selected' : '' %>><%= g.name %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <!-- Status -->
+    <div style="flex: 1; min-width: 140px;">
+      <label class="form-label">Trạng thái</label>
+      <select name="status" class="form-control">
+        <option value="">-- Tất cả --</option>
+        <option value="ongoing" <%= query.status === 'ongoing' ? 'selected' : '' %>>Đang ra</option>
+        <option value="completed" <%= query.status === 'completed' ? 'selected' : '' %>>Hoàn thành</option>
+      </select>
+    </div>
+
+    <!-- Sort -->
+    <div style="flex: 1; min-width: 140px;">
+      <label class="form-label">Sắp xếp</label>
+      <select name="sort" class="form-control">
+        <option value="latest" <%= query.sort === 'latest' ? 'selected' : '' %>>Mới cập nhật</option>
+        <option value="views" <%= query.sort === 'views' ? 'selected' : '' %>>Lượt xem nhiều</option>
+        <option value="newest" <%= query.sort === 'newest' ? 'selected' : '' %>>Mới đăng</option>
+        <option value="title" <%= query.sort === 'title' ? 'selected' : '' %>>Tên truyện A-Z</option>
+      </select>
+    </div>
+
+    <!-- Actions -->
+    <div>
+      <button type="submit" class="btn btn-primary">Lọc truyện</button>
+      <a href="/stories" class="btn btn-secondary" style="margin-left: 6px;">Đặt lại</a>
+    </div>
+  </form>
+
+  <!-- Results Count -->
+  <div style="margin-bottom: 20px; color: var(--text-secondary); font-size: 0.9rem;">
+    Tìm thấy <strong><%= totalStories %></strong> tác phẩm phù hợp.
+  </div>
+
+  <!-- Story Grid -->
+  <div class="story-grid">
+    <% if (stories && stories.length > 0) { %>
+      <% stories.forEach(story => { %>
+        <div class="story-card">
+          <div class="story-cover-wrap">
+            <a href="/stories/<%= story.slug %>">
+              <img src="<%= story.cover_image %>" alt="<%= story.title %>" class="story-cover" onerror="this.src='/public/images/default-cover.png'">
+            </a>
+            <span class="story-badge <%= story.status === 'completed' ? 'badge-completed' : 'badge-ongoing' %>">
+              <%= story.status === 'completed' ? 'Hoàn thành' : 'Đang ra' %>
+            </span>
+          </div>
+          <div class="story-info">
+            <a href="/stories/<%= story.slug %>">
+              <h3 class="story-title" title="<%= story.title %>"><%= story.title %></h3>
+            </a>
+            <div class="story-author">Tác giả: <%= story.author_name %></div>
+            <div class="story-meta">
+              <span>📖 <%= story.total_chapters %> ch</span>
+              <span>👁️ <%= story.views %></span>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <div style="grid-column: 1 / -1; padding: 60px 20px; text-align: center; color: var(--text-muted);">
+        Không có truyện nào phù hợp với bộ lọc tìm kiếm.
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Pagination -->
+  <% if (totalPages > 1) { %>
+    <div class="pagination">
+      <% if (currentPage > 1) { %>
+        <a href="/stories?page=<%= currentPage - 1 %>&q=<%= query.q %>&genre=<%= query.genre %>&status=<%= query.status %>&sort=<%= query.sort %>" class="page-item">&laquo; Trước</a>
+      <% } %>
+
+      <% for (let i = 1; i <= totalPages; i++) { %>
+        <% if (i === currentPage) { %>
+          <span class="page-item active"><%= i %></span>
+        <% } else if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) { %>
+          <a href="/stories?page=<%= i %>&q=<%= query.q %>&genre=<%= query.genre %>&status=<%= query.status %>&sort=<%= query.sort %>" class="page-item"><%= i %></a>
+        <% } else if (i === currentPage - 3 || i === currentPage + 3) { %>
+          <span class="page-item">...</span>
+        <% } %>
+      <% } %>
+
+      <% if (currentPage < totalPages) { %>
+        <a href="/stories?page=<%= currentPage + 1 %>&q=<%= query.q %>&genre=<%= query.genre %>&status=<%= query.status %>&sort=<%= query.sort %>" class="page-item">Sau &raquo;</a>
+      <% } %>
+    </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

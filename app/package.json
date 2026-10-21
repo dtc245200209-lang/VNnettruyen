@@ -1,0 +1,40 @@
+{
+  "name": "vnnettruyen-app",
+  "version": "1.0.0",
+  "description": "VNnettruyen - Website cong dong doc va sang tac truyen Viet Nam",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "keywords": [
+    "vnnettruyen",
+    "reading",
+    "forum",
+    "nodejs",
+    "express",
+    "mysql"
+  ],
+  "author": "VNnettruyen Team",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "connect-flash": "^0.1.1",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-mysql-session": "^3.0.1",
+    "express-rate-limit": "^7.2.0",
+    "express-session": "^1.18.0",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.9.7",
+    "prom-client": "^15.1.2",
+    "sanitize-html": "^2.13.0",
+    "slugify": "^1.6.6",
+    "winston": "^3.13.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
