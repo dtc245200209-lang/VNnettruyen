@@ -227,28 +227,15 @@ INSERT INTO `users` (`id`, `username`, `email`, `password`, `role`, `coins`, `bi
 (2, 'tacgia_viet', 'author@vnnettruyen.vn', '$2a$10$TsecfGtT9maTbSZN6wxnUO0LFYx0Fm3bPAALcylPssgdnqdKy5ow2', 'author', 250, 'Tác giả sáng tác dã sử, kiếm hiệp và huyền huyễn Việt Nam'),
 (3, 'docgia_vn', 'reader@vnnettruyen.vn', '$2a$10$OtEWI1Pj1wge5/A0AQo.qOGPK1.7fsvRtFresEFd71HZlcm21YLX.', 'reader', 120, 'Độc giả đam mê văn học mạng và tiểu thuyết kỳ ảo');
 
--- 20 THỂ LOẠI ĐA DẠNG ĐẶC SẮC (Diễn đàn văn học Việt Nam)
+-- 7 THỂ LOẠI TRUYỆN CHÍNH (THEO YÊU CẦU: Truyện ngắn, Tình Cảm, Dị giới, Xuyên không, Tiên hiệp, Đô thị, Kiếm hiệp)
 INSERT INTO `genres` (`id`, `name`, `slug`, `description`) VALUES
-(1, 'Tiên Hiệp', 'tien-hiep', 'Truyện tu tiên luyện khí, vượt qua giới hạn phàm nhân phi thăng tiên giới'),
-(2, 'Kiếm Hiệp', 'kiem-hiep', 'Hành tẩu giang hồ, nghĩa khí võ hiệp và ân oán giang hồ hào hùng'),
-(3, 'Dã Sử Việt', 'da-su-viet', 'Khai thác bối cảnh lịch sử hào hùng của dân tộc Việt Nam qua góc nhìn sáng tạo'),
-(4, 'Huyền Huyễn', 'huyen-huyen', 'Thế giới ma pháp, dị giới siêu nhiên kỳ bí và pháp bảo vô tận'),
-(5, 'Đô Thị', 'do-thi', 'Bối cảnh cuộc sống hiện đại, thương trường, y thuật và siêu năng lực đô thành'),
-(6, 'Khoa Huyễn', 'khoa-huyen', 'Khoa học viễn tưởng tương lai, du hành vũ trụ và trí tuệ nhân tạo'),
-(7, 'Trinh Thám', 'trinh-tham', 'Phá án ly kỳ, giải mã bí ẩn vụ án hóc búa và tâm lý tội phạm sâu sắc'),
-(8, 'Kinh Dị - Ma Bí', 'kinh-di-ma-bi', 'Truyện ma dân gian, hiện tượng tâm linh rùng rợn và nỗi sợ bí ẩn'),
-(9, 'Truyện Ngắn', 'truyen-ngan', 'Các tác phẩm ngắn cô đọng, giàu cảm xúc và triết lý nhân sinh'),
-(10, 'Tiểu Thuyết', 'tieu-thuyet', 'Các bộ đại tác phẩm văn học trường thiên đa tuyến nhân vật'),
-(11, 'Võng Du', 'vong-du', 'Thế giới thực tế ảo, game online thế hệ mới và tranh đoạt thần cấp'),
-(12, 'Viễn Tưởng - Kỳ Ảo', 'vien-tuong-ky-ao', 'Thế giới huyền bí, kỳ quan cổ đại và các chủng tộc viễn tưởng'),
-(13, 'Tình Cảm - Lãng Mạn', 'tinh-cam', 'Chuyện tình yêu ngọt ngào, sâu lắng, duyên phận cuộc đời'),
-(14, 'Phiêu Lưu - Hành Động', 'phieu-luu-hanh-dong', 'Thám hiểm vùng đất cấm, sinh tồn nơi hoang dã và chiến đấu sinh tử'),
-(15, 'Truyện Cười', 'truyen-cuoi', 'Những mẩu chuyện hài hước, châm biếm, đem lại tiếng cười sảng khoái'),
-(16, 'Xuyên Không', 'xuyen-khong', 'Vượt thời không về quá khứ hoặc đến dị giới bắt đầu cuộc đời mới'),
-(17, 'Đồng Nhân', 'dong-nhan', 'Phóng tác dựa trên các tác phẩm, vũ trụ anime hoặc tiểu thuyết kinh điển'),
-(18, 'Dị Giới', 'di-gioi', 'Chuyển sinh sang thế giới phép thuật, ma thú và các chủng tộc kỳ lạ'),
-(19, 'Góc Tâm Hồn - Tản Văn', 'tan-van', 'Những rung cảm nhẹ nhàng, tản mạn về cuộc sống, ký ức tuổi thơ'),
-(20, 'Học Văn - Nghị Luận', 'hoc-van', 'Chia sẻ kiến thức nghị luận văn học, kỹ năng viết và phân tích tác phẩm');
+(1, 'Truyện Ngắn', 'truyen-ngan', 'Các tác phẩm ngắn gọn, súc tích, giàu cảm xúc và triết lý nhân sinh'),
+(2, 'Tình Cảm', 'tinh-cam', 'Chuyện tình yêu ngọt ngào, sâu lắng, duyên phận cuộc đời'),
+(3, 'Dị Giới', 'di-gioi', 'Chuyển sinh sang thế giới phép thuật, ma thú và các chủng tộc kỳ lạ'),
+(4, 'Xuyên Không', 'xuyen-khong', 'Vượt thời không về quá khứ hoặc đến thế giới khác bắt đầu cuộc đời mới'),
+(5, 'Tiên Hiệp', 'tien-hiep', 'Truyện tu tiên luyện khí, vượt qua giới hạn phàm nhân phi thăng tiên giới'),
+(6, 'Đô Thị', 'do-thi', 'Bối cảnh cuộc sống hiện đại, thương trường, y thuật và năng lực đô thành'),
+(7, 'Kiếm Hiệp', 'kiem-hiep', 'Hành tẩu giang hồ, nghĩa khí võ hiệp và ân oán phân minh');
 
 -- 15 TÁC PHẨM ĐA DẠNG ĐẦY ĐỦ THỂ LOẠI (Chuẩn font tiếng Việt không lỗi)
 INSERT INTO `stories` (`id`, `title`, `slug`, `author_id`, `description`, `cover_image`, `status`, `views`, `is_featured`) VALUES
@@ -256,7 +243,7 @@ INSERT INTO `stories` (`id`, `title`, `slug`, `author_id`, `description`, `cover
 (2, 'Thăng Long Kiếm Ảo', 'thang-long-kiem-ao', 2, 'Kinh thành Thăng Long sầm uất ẩn giấu những môn phái cổ xưa bảo vệ bờ cõi. Một cuộc kỳ ngộ giữa thiếu niên mồ côi và lão kiếm khách ẩn danh đã mở ra trang sử giang hồ đầy kịch tính.', '/public/images/cover-2.jpg', 'ongoing', 8940, 1),
 (3, 'Bạch Hạc Dạ Hành', 'bach-hac-da-hanh', 2, 'Đất Phong Châu ngút ngàn rừng thiêng nước độc, những vụ mất tích kỳ quái của các đoàn thương buôn đưa bộ đôi hình bộ phán quan vào vòng xoáy ma thuật cổ xưa.', '/public/images/cover-3.jpg', 'completed', 21450, 1),
 (4, 'Pháp Mệnh Thiên Tôn', 'phap-menh-thien-ton', 2, 'Ta không muốn bạo lực, càng không muốn xuống tay. Nhưng nếu người đã cố chấp, lại làm hại đến người đó, đừng hỏi tại sao thế gian này tàn nhẫn! Siêu phẩm tiên hiệp huyền huyễn khuấy đảo diễn đàn.', '/public/images/banner-spotlight.jpg', 'ongoing', 110157, 1),
-(5, 'Ác Mộng Tập', 'ac-mong-tap', 2, 'Tập hợp những câu chuyện kinh dị có thật chốn thôn quê và các khu chung cư cũ bỏ hoang giữa lòng Hà Nội và Sài Gòn. Mỗi cơn ác mộng đều mang theo một lời cảnh báo từ quá khứ.', '/public/images/cover-2.jpg', 'ongoing', 35860, 1),
+(5, 'Ác Mộng Tập', 'ac-mong-tap', 2, 'Tập hợp những câu chuyện kỳ bí có thật chốn thôn quê và các khu chung cư cũ bỏ hoang giữa lòng Hà Nội và Sài Gòn. Mỗi cơn ác mộng đều mang theo một lời cảnh báo từ quá khứ.', '/public/images/cover-2.jpg', 'ongoing', 35860, 1),
 (6, 'Dây Tơ Hồng Nối Ngược', 'day-to-hong-noi-nguoc', 3, 'Tôi hay nghe, chúng ta không phải những kẻ đáng thương nhất, mà là họ. Chưa từng có ai hỏi họ có mệt không? Có muốn buông tay hay không... Một câu chuyện tình cảm sâu lắng đầy cảm xúc.', '/public/images/cover-3.jpg', 'ongoing', 19084, 1),
 (7, 'Người Trong Giang Hồ (Luận Đàm)', 'nguoi-trong-giang-ho', 2, 'Luận bàn về chữ Tình, chữ Nghĩa và danh lợi chốn võ lâm đương đại. Khi gươm đao gác lại, thứ còn đọng lại trong lòng kiếm khách chỉ là một chén rượu ấm tình bằng hữu.', '/public/images/cover-1.jpg', 'ongoing', 51948, 1),
 (8, 'Đất Ma – Quyển 1: Bắc Hành', 'dat-ma-bac-hanh', 2, 'Hành trình vượt qua vùng đất chết phía bắc dãy Trường Sơn. Những cổ trùng, linh thụ ngàn năm và các bộ tộc kỳ bí thời thượng cổ dần hé lộ chân tướng kinh hoàng.', '/public/images/cover-2.jpg', 'ongoing', 133609, 1),
@@ -268,23 +255,23 @@ INSERT INTO `stories` (`id`, `title`, `slug`, `author_id`, `description`, `cover
 (14, 'Võng Du: Thần Cấp Trọng Sinh', 'vong-du-than-cap-trong-sinh', 2, 'Trọng sinh về 10 năm trước ngày máy chủ Thần Vực mở cửa, Lâm Tiêu mang theo ký ức của một Thần Cấp Đạo Tặc từng bước độc chiếm tài nguyên thế giới ảo.', '/public/images/cover-2.jpg', 'ongoing', 78500, 1),
 (15, 'Đô Thị Tiên Phong 2026', 'do-thi-tien-phong-2026', 1, 'Sau khi du học trở về, kỹ sư trẻ Hoàng Nam phát hiện khả năng nhìn thấy các dòng chảy năng lượng trong dữ liệu máy tính, biến anh thành bậc thầy công nghệ siêu phàm.', '/public/images/cover-1.jpg', 'ongoing', 4500, 0);
 
--- LIÊN KẾT TRUYỆN VÀ THỂ LOẠI (ĐA THỂ LOẠI)
+-- LIÊN KẾT TRUYỆN VÀ THỂ LOẠI (7 THỂ LOẠI CHÍNH)
 INSERT INTO `story_genres` (`story_id`, `genre_id`) VALUES
-(1, 1), (1, 3), (1, 4),    -- Huyền Khí Đại Việt: Tiên Hiệp, Dã Sử Việt, Huyền Huyễn
-(2, 2), (2, 3),             -- Thăng Long Kiếm Ảo: Kiếm Hiệp, Dã Sử Việt
-(3, 7), (3, 8),             -- Bạch Hạc Dạ Hành: Trinh Thám, Kinh Dị - Ma Bí
-(4, 1), (4, 4),             -- Pháp Mệnh Thiên Tôn: Tiên Hiệp, Huyền Huyễn
-(5, 8), (5, 9),             -- Ác Mộng Tập: Kinh Dị - Ma Bí, Truyện Ngắn
-(6, 10), (6, 13),           -- Dây Tơ Hồng Nối Ngược: Tiểu Thuyết, Tình Cảm
-(7, 2), (7, 19),            -- Người Trong Giang Hồ: Kiếm Hiệp, Tản Văn
-(8, 18), (8, 8),            -- Đất Ma: Dị Giới, Kinh Dị
-(9, 19), (9, 9),            -- Chuyện Hoa, Chuyện Người: Tản Văn, Truyện Ngắn
-(10, 19), (10, 20),         -- Biên Niên Ký: Tản Văn, Học Văn
-(11, 17), (11, 14),         -- Thanh Gươm Diệt Quỷ: Đồng Nhân, Hành Động
-(12, 9), (12, 19),          -- Cơm Tấm Sườn Bì Chả: Truyện Ngắn, Tản Văn
-(13, 20),                   -- Cấu Trúc Văn: Học Văn
-(14, 11), (14, 12),         -- Võng Du Thần Cấp: Võng Du, Viễn Tưởng
-(15, 5), (15, 6);           -- Đô Thị Tiên Phong: Đô Thị, Khoa Huyễn
+(1, 5), (1, 7),             -- Huyền Khí Đại Việt: Tiên Hiệp, Kiếm Hiệp
+(2, 7),                     -- Thăng Long Kiếm Ảo: Kiếm Hiệp
+(3, 7), (3, 3),             -- Bạch Hạc Dạ Hành: Kiếm Hiệp, Dị Giới
+(4, 5), (4, 3),             -- Pháp Mệnh Thiên Tôn: Tiên Hiệp, Dị Giới
+(5, 1), (5, 3),             -- Ác Mộng Tập: Truyện Ngắn, Dị Giới
+(6, 2),                     -- Dây Tơ Hồng Nối Ngược: Tình Cảm
+(7, 7),                     -- Người Trong Giang Hồ: Kiếm Hiệp
+(8, 3),                     -- Đất Ma: Dị Giới
+(9, 1), (9, 2),             -- Chuyện Hoa, Chuyện Người: Truyện Ngắn, Tình Cảm
+(10, 1),                    -- Biên Niên Ký: Truyện Ngắn
+(11, 4), (11, 3),           -- Thanh Gươm Diệt Quỷ: Xuyên Không, Dị Giới
+(12, 1), (12, 2),           -- Cơm Tấm Sườn Bì Chả: Truyện Ngắn, Tình Cảm
+(13, 1),                    -- Cấu Trúc Văn: Truyện Ngắn
+(14, 4), (14, 3),           -- Võng Du Thần Cấp: Xuyên Không, Dị Giới
+(15, 6);                    -- Đô Thị Tiên Phong: Đô Thị
 
 -- CÁC CHƯƠNG TRUYỆN MẪU (NỘI DUNG VĂN HỌC TIẾNG VIỆT CHUẨN)
 INSERT INTO `chapters` (`id`, `story_id`, `chapter_number`, `title`, `content`, `status`) VALUES

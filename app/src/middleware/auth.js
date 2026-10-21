@@ -1,5 +1,7 @@
 const db = require('../config/db');
 
+let cachedGenres = null;
+
 // Middleware kiểm tra và phân quyền người dùng
 async function attachUser(req, res, next) {
   if (req.session.user) {
@@ -13,8 +15,18 @@ async function attachUser(req, res, next) {
     }
   }
 
+  if (!cachedGenres) {
+    try {
+      const [genres] = await db.query('SELECT * FROM genres ORDER BY id ASC');
+      if (genres && genres.length > 0) {
+        cachedGenres = genres;
+      }
+    } catch (e) {}
+  }
+
   res.locals.currentUser = req.session.user || null;
   res.locals.currentPath = req.path;
+  res.locals.genres = res.locals.genres || cachedGenres || [];
   res.locals.success_msg = req.flash('success_msg');
   res.locals.error_msg = req.flash('error_msg');
   next();

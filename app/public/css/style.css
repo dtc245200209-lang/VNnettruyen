@@ -221,53 +221,171 @@ a:hover {
   border-radius: 3px;
 }
 
-/* Các nút chức năng header */
+/* Khu vực thao tác Auth & Nút Viết bài (Phong cách Vnkings tinh tế) */
 .header-auth-actions {
   display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Nút Viết bài nổi bật */
+.header-write-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  color: #c2410c;
+  background-color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.header-write-btn:hover {
+  background-color: #fff7ed;
+  color: #ea580c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.16);
+}
+
+/* Auth khách (Chưa đăng nhập): Tinh gọn, thanh lịch */
+.header-auth-guest {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.header-auth-link {
+  color: #ffffff;
+  text-decoration: none;
+  transition: opacity 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.header-auth-link:hover {
+  color: #fef08a;
+  text-decoration: underline;
+}
+
+.header-auth-sep {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+  user-select: none;
+}
+
+.header-auth-register {
+  padding: 5px 12px;
+  background-color: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.header-auth-register:hover {
+  background-color: rgba(255, 255, 255, 0.32);
+  color: #ffffff;
+  text-decoration: none;
+}
+
+/* Auth thành viên (Đã đăng nhập): Pill thông tin hiện đại */
+.header-auth-user {
+  display: inline-flex;
   align-items: center;
   gap: 8px;
 }
 
-.header-btn {
+.header-admin-tag {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 14px;
-  font-size: 0.85rem;
+  padding: 4px 8px;
+  font-size: 0.75rem;
   font-weight: 700;
-  border-radius: var(--radius-sm);
   color: #ffffff;
+  background-color: #ef4444;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: background-color 0.15s;
+}
+
+.header-admin-tag:hover {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+.header-user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 6px;
   background-color: rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  border-radius: 9999px;
+  color: #ffffff;
+  text-decoration: none;
   transition: all 0.2s ease;
 }
 
-.header-btn:hover {
-  background-color: rgba(0, 0, 0, 0.3);
+.header-user-pill:hover {
+  background-color: rgba(0, 0, 0, 0.28);
+  border-color: rgba(255, 255, 255, 0.6);
   color: #ffffff;
-  transform: translateY(-1px);
 }
 
-.header-btn-post {
-  background-color: #ea580c;
-  border-color: #ffedd5;
+.header-user-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid #ffffff;
 }
 
-.header-btn-post:hover {
-  background-color: #c2410c;
+.header-user-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  max-width: 110px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.user-badge-coins {
-  background-color: #fef08a;
-  color: #854d0e;
-  font-size: 0.75rem;
+.header-user-coins {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  font-size: 0.72rem;
   font-weight: 800;
-  padding: 3px 8px;
+  color: #78350f;
+  background-color: #fef08a;
   border-radius: 9999px;
+}
+
+.header-logout-btn {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  padding: 5px 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  background-color: rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.header-logout-btn:hover {
+  background-color: rgba(239, 68, 68, 0.85);
+  border-color: #ef4444;
+  color: #ffffff;
 }
 
 /* Thanh Menu chính màu xanh đen (Dark Slate Nav) */
@@ -387,6 +505,25 @@ a:hover {
   color: #0369a1;
   text-decoration: underline;
   background-color: rgba(2, 132, 199, 0.08);
+}
+
+.sub-genre-sep {
+  color: var(--border-color);
+  font-size: 0.85rem;
+  user-select: none;
+}
+
+.sub-genre-link-completed {
+  color: #16a34a !important;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .sub-genre-link-completed {
+  color: #4ade80 !important;
+}
+
+.sub-genre-link-completed:hover {
+  background-color: rgba(22, 163, 74, 0.1) !important;
 }
 
 /* ==============================================================================
