@@ -1,0 +1,101 @@
+<%- include('../../partials/header') %>
+
+<div style="margin: 20px 0;">
+  <!-- Breadcrumbs & Nút Tạo Bài Viết -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+    <div>
+      <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px;">
+        <a href="/">Trang chủ</a> &gt; <a href="/forum">Diễn đàn</a> &gt; <strong style="color: var(--text-main);"><%= category.name %></strong>
+      </div>
+      <h1 style="font-size: 1.4rem; color: var(--text-main); font-weight: 800; display: flex; align-items: center; gap: 8px;">
+        <span><%= category.icon || '💬' %></span> <%= category.name %>
+      </h1>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin: 4px 0 0 0;">
+        <%= category.description %>
+      </p>
+    </div>
+
+    <div>
+      <a href="/forum/create?category=<%= category.id %>" class="btn btn-primary" style="padding: 9px 18px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+        <span>✏️</span> + Đăng bài trong mục này
+      </a>
+    </div>
+  </div>
+
+  <!-- Danh sách bài viết trong chuyên mục -->
+  <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); margin-bottom: 24px;">
+    <!-- Header bảng bài viết -->
+    <div style="background-color: var(--nav-dark); color: #ffffff; padding: 12px 18px; font-size: 0.85rem; font-weight: 700; display: grid; grid-template-columns: 1fr 140px 100px 180px; gap: 12px; align-items: center;">
+      <div>CHỦ ĐỀ BÀI VIẾT</div>
+      <div style="text-align: center;">NGƯỜI ĐĂNG</div>
+      <div style="text-align: center;">PHẢN HỒI / XEM</div>
+      <div style="text-align: right;">BÌNH LUẬN CUỐI</div>
+    </div>
+
+    <div>
+      <% if (posts && posts.length > 0) { %>
+        <% posts.forEach(post => { %>
+          <div style="display: grid; grid-template-columns: 1fr 140px 100px 180px; gap: 12px; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--border-color); transition: background 0.15s;">
+            <!-- Tiêu đề & Tag -->
+            <div style="min-width: 0;">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <% if (post.is_pinned) { %>
+                  <span style="background-color: #ef4444; color: #ffffff; font-size: 0.7rem; font-weight: 800; padding: 1px 6px; border-radius: 3px;">GHIM</span>
+                <% } %>
+                <a href="/forum/posts/<%= post.slug %>" style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); line-height: 1.4;">
+                  <%= post.title %>
+                </a>
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
+                Đăng ngày: <%= new Date(post.created_at).toLocaleDateString('vi-VN') %>
+              </div>
+            </div>
+
+            <!-- Người đăng -->
+            <div style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.82rem;">
+              <img src="<%= post.avatar || '/public/images/default-avatar.png' %>" alt="<%= post.username %>" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover;" onerror="this.src='/public/images/logo.png'">
+              <strong><%= post.username %></strong>
+            </div>
+
+            <!-- Thống kê -->
+            <div style="text-align: center; font-size: 0.8rem; color: var(--text-muted);">
+              <div><strong style="color: var(--accent-blue);"><%= post.reply_count || 0 %></strong> trả lời</div>
+              <div style="font-size: 0.72rem; margin-top: 2px;"><%= post.views || 0 %> lượt xem</div>
+            </div>
+
+            <!-- Bình luận cuối -->
+            <div style="text-align: right; font-size: 0.78rem; color: var(--text-muted);">
+              <% if (post.last_reply_user) { %>
+                <div>Bởi: <strong style="color: var(--text-main);"><%= post.last_reply_user %></strong></div>
+                <div style="font-size: 0.72rem;"><%= new Date(post.last_reply_time).toLocaleDateString('vi-VN') %></div>
+              <% } else { %>
+                <span style="font-style: italic;">Chưa có phản hồi</span>
+              <% } %>
+            </div>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <div style="padding: 40px; text-align: center; color: var(--text-muted);">
+          <div style="font-size: 2.5rem; margin-bottom: 10px;">📭</div>
+          <p>Chuyên mục này hiện chưa có bài viết thảo luận nào.</p>
+          <a href="/forum/create?category=<%= category.id %>" class="btn btn-primary btn-sm" style="margin-top: 10px;">
+            Hãy là người đầu tiên đăng bài!
+          </a>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Phân trang -->
+  <% if (totalPages > 1) { %>
+    <div style="display: flex; justify-content: center; gap: 6px; margin: 20px 0;">
+      <% for (let i = 1; i <= totalPages; i++) { %>
+        <a href="/forum/categories/<%= category.slug %>?page=<%= i %>" class="btn <%= currentPage === i ? 'btn-primary' : 'btn-secondary' %> btn-sm" style="min-width: 36px; text-align: center;">
+          <%= i %>
+        </a>
+      <% } %>
+    </div>
+  <% } %>
+</div>
+
+<%- include('../../partials/footer') %>

@@ -15,6 +15,9 @@ COLLATE utf8mb4_unicode_ci;
 USE `vnnettruyen_db`;
 
 SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `forum_replies`;
+DROP TABLE IF EXISTS `forum_posts`;
+DROP TABLE IF EXISTS `forum_categories`;
 DROP TABLE IF EXISTS `sessions`;
 DROP TABLE IF EXISTS `forum_announcements`;
 DROP TABLE IF EXISTS `daily_checkins`;
@@ -160,6 +163,55 @@ CREATE TABLE `sessions` (
   `data` MEDIUMTEXT COLLATE utf8mb4_bin,
   INDEX `idx_sessions_expires` (`expires`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 12. Bảng chuyên mục diễn đàn (forum_categories)
+CREATE TABLE `forum_categories` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(100) NOT NULL,
+  `slug` VARCHAR(120) NOT NULL UNIQUE,
+  `description` VARCHAR(255) NULL,
+  `icon` VARCHAR(50) DEFAULT '💬',
+  `display_order` INT DEFAULT 0,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX `idx_forum_cat_slug` (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 13. Bảng bài viết / chủ đề thảo luận diễn đàn (forum_posts)
+CREATE TABLE `forum_posts` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `category_id` INT NOT NULL,
+  `user_id` INT NOT NULL,
+  `title` VARCHAR(255) NOT NULL,
+  `slug` VARCHAR(255) NOT NULL UNIQUE,
+  `content` MEDIUMTEXT NOT NULL,
+  `views` INT DEFAULT 0,
+  `is_pinned` TINYINT(1) DEFAULT 0,
+  `is_locked` TINYINT(1) DEFAULT 0,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (`category_id`) REFERENCES `forum_categories`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  INDEX `idx_forum_posts_slug` (`slug`),
+  INDEX `idx_forum_posts_cat` (`category_id`),
+  INDEX `idx_forum_posts_user` (`user_id`),
+  INDEX `idx_forum_posts_pinned` (`is_pinned`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 14. Bảng bình luận / phản hồi bài viết diễn đàn (forum_replies)
+CREATE TABLE `forum_replies` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `post_id` INT NOT NULL,
+  `user_id` INT NOT NULL,
+  `content` TEXT NOT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (`post_id`) REFERENCES `forum_posts`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  INDEX `idx_forum_replies_post` (`post_id`),
+  INDEX `idx_forum_replies_user` (`user_id`),
+  INDEX `idx_forum_replies_created` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 
 -- ===================================================
@@ -324,9 +376,66 @@ INSERT INTO `daily_checkins` (`id`, `user_id`, `coins_earned`, `created_at`) VAL
 
 -- THÔNG BÁO BẢN TIN DIỄN ĐÀN
 INSERT INTO `forum_announcements` (`id`, `title`, `url`, `color`, `display_order`) VALUES
-(1, 'Kiếm tiền online: Viết truyện và nhận nhuận bút tại VNnettruyen', '/stories', '#e74c3c', 1),
-(2, 'Nội Quy Website & Quy Tắc Ứng Xử Cộng Đồng VNnettruyen.vn', '/stories', '#e67e22', 2),
-(3, 'Phản Hồi – Hỏi Đáp – Góp Ý Phát Triển Diễn Đàn', '/stories', '#27ae60', 3),
+(1, 'Kiếm tiền online: Viết truyện và nhận nhuận bút tại VNnettruyen', '/forum/categories/thong-bao-noi-quy', '#e74c3c', 1),
+(2, 'Nội Quy Website & Quy Tắc Ứng Xử Cộng Đồng VNnettruyen.vn', '/forum/categories/thong-bao-noi-quy', '#e67e22', 2),
+(3, 'Phản Hồi – Hỏi Đáp – Góp Ý Phát Triển Diễn Đàn', '/forum/categories/hoi-dap-bao-loi', '#27ae60', 3),
 (4, 'Hướng Dẫn Thành Viên Mới Đăng Tác Phẩm Đầu Tay', '/author/stories/create', '#8e44ad', 4),
 (5, 'Hướng Dẫn Đăng Các Chương Mới & Chỉnh Sửa Bản Thảo', '/author', '#2980b9', 5),
-(6, 'Những lưu ý và lý do khiến truyện của bạn chưa được duyệt', '/stories', '#d35400', 6);
+(6, 'Những lưu ý và lý do khiến truyện của bạn chưa được duyệt', '/forum/categories/thong-bao-noi-quy', '#d35400', 6);
+
+-- 6 CHUYÊN MỤC DIỄN ĐÀN (FORUM CATEGORIES)
+INSERT INTO `forum_categories` (`id`, `name`, `slug`, `description`, `icon`, `display_order`) VALUES
+(1, 'Thông Báo & Nội Quy', 'thong-bao-noi-quy', 'Quy tắc sinh hoạt cộng đồng, quyền lợi thành viên và thông báo chính thức từ Ban Quản Trị', '📢', 1),
+(2, 'Góc Sáng Tác & Góp Ý', 'sang-tac-gop-y', 'Nơi tác giả đăng bản thảo, chia sẻ kinh nghiệm viết văn và đón nhận ý kiến đóng góp chân thành', '✍️', 2),
+(3, 'Thảo Luận Tiểu Thuyết', 'thao-luan-tieu-thuyet', 'Bàn luận sâu về cốt truyện, nhân vật, bối cảnh các bộ tiểu thuyết kiếm hiệp, tiên hiệp, huyền huyễn', '📖', 3),
+(4, 'Tìm Truyện & Review Sách Hay', 'review-tim-truyen', 'Chia sẻ cảm nhận, review sách kinh điển, tìm kiếm các bộ truyện hay theo sở thích', '🔍', 4),
+(5, 'Quán Trà Đàm Đạo & Giao Lưu', 'giao-luu-ket-ban', 'Không gian thư giãn tự do, truyện cười, chuyện đời thường, kết bạn bốn phương', '🍵', 5),
+(6, 'Hỏi Đáp & Báo Lỗi Kỹ Thuật', 'hoi-dap-bao-loi', 'Hỗ trợ giải đáp thắc mắc tài khoản, tính năng website và tiếp nhận báo cáo lỗi hệ thống', '💡', 6);
+
+-- BÀI VIẾT THẢO LUẬN DIỄN ĐÀN (FORUM POSTS / THREADS)
+INSERT INTO `forum_posts` (`id`, `category_id`, `user_id`, `title`, `slug`, `content`, `views`, `is_pinned`, `is_locked`) VALUES
+(1, 5, 2, '[Truyện Cười] Tuyệt Chiêu Giữ Lửa Hôn Nhân Của Ông Nội', 'tuyet-chieu-giu-lua-hon-nhan-ong-noi', 
+'Hôm qua ngồi uống trà với ông nội, cháu hỏi: "Ông ơi, bí quyết nào giúp ông bà sống hạnh phúc hơn 50 năm qua mà chưa từng to tiếng một lần?".
+
+Ông cười hiền từ bảo: "Ngày cưới, bà mày cưỡi ngựa về nhà chồng. Giữa đường ngựa vấp ngã lần một, bà bảo: Lần một! Đi thêm một đoạn ngựa lại ngã, bà bảo: Lần hai! Đến lần thứ ba, bà rút súng bắn chết con ngựa. Tao hoảng quá mắng bà sao ác thế. Bà quay sang nhìn tao, nhẹ nhàng bảo: Lần một!".
+
+Từ đó đến nay tao chưa từng cãi bà câu nào...', 540, 0, 0),
+
+(2, 4, 3, '[Review] Rừng Na Uy: Bản Jazz u sầu của những kẻ lạc lối giữa thanh xuân', 'review-rung-na-uy-ban-jazz-u-sau', 
+'Rừng Na Uy không phải cuốn sách để bạn đọc khi đang tìm kiếm một cái kết màu hồng. Đó là bản nhạc trầm buồn về sự cô đơn, về những mất mát không thể bù đắp của tuổi trẻ...
+
+Toru Watanabe, Naoko, Midori - mỗi nhân vật đều mang theo những vết thương riêng. Có ai ở đây từng đọc qua và có cùng cảm xúc trống trải nhưng đầy ám ảnh như mình không?', 890, 1, 0),
+
+(3, 5, 3, '[Giao Lưu - Kết Bạn] Thành viên mới xin chào cả nhà VNnettruyen!', 'thanh-vien-moi-xin-chao-ca-nha', 
+'Chào Ban Quản Trị và các tiền bối độc giả, tác giả!
+
+Mình là thành viên mới gia nhập diễn đàn, sở thích là cày các bộ tiên hiệp, kiếm hiệp và dã sử Việt Nam. Rất mong được làm quen, giao lưu và học hỏi kinh nghiệm viết lách từ mọi người ạ!', 320, 0, 0),
+
+(4, 2, 2, '[Sáng Tác] Kinh nghiệm xây dựng hệ thống tu luyện logic cho truyện tiên hiệp', 'kinh-nghiem-xay-dung-he-thong-tu-luyen', 
+'Chào anh em đồng đạo sáng tác!
+
+Một trong những lỗi phổ biến nhất khi viết truyện tu tiên là "lạm phát cảnh giới" và "sức mạnh tăng tiến thiếu logic". Để bộ truyện giữ được sức hút đường dài, mình xin chia sẻ 3 nguyên tắc cốt lõi:
+1. Phân chia ranh giới rõ ràng giữa các cảnh giới (Luyện Khí, Trúc Cơ, Kim Đan, Nguyên Anh...).
+2. Mỗi lần đột phá phải đi kèm trả giá hoặc kỳ ngộ xứng đáng, không buff vô tội vạ.
+3. Hệ thống công pháp và linh căn cần có sự tương khắc ngũ hành.
+
+Mọi người cùng thảo luận và đóng góp thêm kinh nghiệm nhé!', 1450, 1, 0),
+
+(5, 5, 3, '[Tản Văn] Chuyện hoa, chuyện người nơi ngõ nhỏ Hà Nội', 'chuyen-hoa-chuyen-nguoi-ngo-nho-ha-noi', 
+'Sớm mùa thu Hà Nội, bước chân ra ngõ đã nghe thoang thoảng mùi hoa sữa đầu mùa pha lẫn hương cốm non xào dừa. Những mái ngói rêu phong cũ kỹ, những cụ già ngồi đánh cờ bên quán nước chè chén... Dường như thời gian ở con ngõ này trôi chậm hơn thế giới ngoài kia rất nhiều.', 410, 0, 0),
+
+(6, 1, 1, '[Thông Báo] Thể lệ tham gia sự kiện Đua Top Sáng Tác Quý 4/2026', 'thong-bao-dua-top-sang-tac-quy-4-2026', 
+'Ban Quản Trị VNnettruyen xin trân trọng thông báo sự kiện "Đua Top Tác Giả & Tác Phẩm Sáng Tác Xuất Sắc Quý 4/2026".
+
+Cơ cấu giải thưởng gồm nhuận bút hấp dẫn bằng Xu và quà tặng, huy hiệu vinh danh độc quyền trên diễn đàn. Chi tiết thể lệ mời anh chị em theo dõi bên dưới!', 2100, 1, 0);
+
+-- BÌNH LUẬN / PHẢN HỒI BÀI VIẾT DIỄN ĐÀN (FORUM REPLIES)
+INSERT INTO `forum_replies` (`id`, `post_id`, `user_id`, `content`) VALUES
+(1, 1, 3, 'Hahaha đọc xong cười suýt sặc nước chè! Ông nội cao tay thật sự!'),
+(2, 1, 1, 'Bí quyết giữ lửa hôn nhân này quá đỉnh, đáng để cánh mày râu học hỏi 😂'),
+(3, 2, 2, 'Rừng Na Uy đọc lúc 20 tuổi và lúc 30 tuổi cảm nhận hoàn toàn khác nhau. Murakami miêu tả nỗi cô đơn thật sự thấm thía.'),
+(4, 3, 2, 'Chào mừng bạn đến với VNnettruyen nhé! Có ý tưởng gì cứ mạnh dạn vào mục Sáng Tác mở chủ đề nha.'),
+(5, 3, 1, 'Chào mừng tân thủ gia nhập gia đình VNnettruyen! Nhớ điểm danh mỗi ngày nhận Xu nhé bạn.'),
+(6, 4, 3, 'Rất đồng tình với bác tác giả! Nhiều truyện vừa vào chương 10 đã đấm vỡ hư không đọc ngấy lắm. Hệ thống tu luyện phải chậm và chắc mới hay.'),
+(7, 4, 1, 'Bài viết chất lượng! BQT đã ghim bài lên đầu chuyên mục Góc Sáng Tác để anh em tham khảo.');
+

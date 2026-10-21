@@ -52,17 +52,35 @@ exports.getHome = async (req, res) => {
       LIMIT 8
     `);
 
-    // 5. Hoạt động mới / Bình luận thảo luận (Cột bên trái của 2-column updates)
-    const [recentComments] = await db.query(`
-      SELECT c.id, c.content, c.created_at,
+    // 5. Hoạt động diễn đàn mới (Bài viết & Thảo luận từ forum_posts)
+    const [forumPosts] = await db.query(`
+      SELECT p.id, p.title, p.slug, p.views, p.created_at, p.updated_at,
              u.username, u.avatar,
-             s.title AS story_title, s.slug AS story_slug,
-             (SELECT name FROM genres g JOIN story_genres sg ON g.id = sg.genre_id WHERE sg.story_id = s.id LIMIT 1) AS genre_name
-      FROM comments c
-      JOIN users u ON c.user_id = u.id
-      JOIN stories s ON c.story_id = s.id
-      ORDER BY c.created_at DESC
+             c.name AS category_name, c.slug AS category_slug,
+             (SELECT COUNT(*) FROM forum_replies WHERE post_id = p.id) AS reply_count,
+             (
+               SELECT u2.username 
+               FROM forum_replies r2 
+               JOIN users u2 ON r2.user_id = u2.id 
+               WHERE r2.post_id = p.id 
+               ORDER BY r2.created_at DESC 
+               LIMIT 1
+             ) AS last_reply_user
+      FROM forum_posts p
+      JOIN users u ON p.user_id = u.id
+      JOIN forum_categories c ON p.category_id = c.id
+      ORDER BY p.updated_at DESC, p.created_at DESC
       LIMIT 8
+    `);
+
+    // Danh sách chuyên mục diễn đàn cho trang chủ
+    const [forumCategories] = await db.query(`
+      SELECT c.*,
+             COUNT(p.id) AS post_count
+      FROM forum_categories c
+      LEFT JOIN forum_posts p ON c.id = p.category_id
+      GROUP BY c.id
+      ORDER BY c.display_order ASC
     `);
 
     // 6. Dòng tin Điểm Danh thành viên (Check-in Ticker)
@@ -74,7 +92,13 @@ exports.getHome = async (req, res) => {
       LIMIT 6
     `);
 
-    // 7. Hoạt động chung cộng đồng (Sidebar Community Stream)
+    // 7. Thống kê diễn đàn & cộng đồng người dùng
+    const [[statUsers]] = await db.query('SELECT COUNT(*) AS count FROM users');
+    const [[statPosts]] = await db.query('SELECT COUNT(*) AS count FROM forum_posts');
+    const [[statStories]] = await db.query('SELECT COUNT(*) AS count FROM stories');
+    const [[latestMember]] = await db.query('SELECT username, created_at FROM users ORDER BY created_at DESC LIMIT 1');
+
+    // Hoạt động chung cộng đồng
     const [communityActivities] = await db.query(`
       SELECT 'comment' AS type, u.username, u.avatar, s.title AS story_title, s.slug AS story_slug, c.created_at
       FROM comments c
@@ -102,7 +126,14 @@ exports.getHome = async (req, res) => {
       spotlightStory,
       announcements,
       latestChapters,
-      recentComments,
+      forumPosts,
+      forumCategories,
+      forumStats: {
+        totalUsers: statUsers.count,
+        totalPosts: statPosts.count,
+        totalStories: statStories.count,
+        latestMember: latestMember ? latestMember.username : 'Chưa có'
+      },
       checkinFeed,
       communityActivities,
       rankingStories,

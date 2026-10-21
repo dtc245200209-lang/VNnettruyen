@@ -1,0 +1,165 @@
+<%- include('../../partials/header') %>
+
+<div style="margin: 20px 0;">
+  <!-- Breadcrumbs & Tiêu đề -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+    <div>
+      <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px;">
+        <a href="/">Trang chủ</a> &gt; <strong style="color: var(--text-main);">Diễn Đàn Thảo Luận</strong>
+      </div>
+      <h1 style="font-size: 1.5rem; color: var(--text-main); font-weight: 800; display: flex; align-items: center; gap: 8px;">
+        <span>💬</span> DIỄN ĐÀN CỘNG ĐỒNG VNNETTRUYEN
+      </h1>
+    </div>
+
+    <div>
+      <a href="/forum/create" class="btn btn-primary" style="padding: 9px 18px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+        <span>✏️</span> + Đăng bài thảo luận mới
+      </a>
+    </div>
+  </div>
+
+  <div class="forum-home-layout" style="display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start;">
+    
+    <!-- CỘT CHÍNH: DANH SÁCH CHUYÊN MỤC DIỄN ĐÀN -->
+    <div>
+      <!-- Danh sách chuyên mục -->
+      <div class="forum-category-box" style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; margin-bottom: 24px; box-shadow: var(--shadow-sm);">
+        <div style="background-color: var(--nav-dark); color: #ffffff; padding: 12px 18px; font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; justify-content: space-between;">
+          <span>📋 CHUYÊN MỤC THẢO LUẬN CHÍNH</span>
+          <span style="font-size: 0.8rem; font-weight: 400; color: #cbd5e1;">Diễn đàn văn học Việt Nam</span>
+        </div>
+
+        <div class="forum-cat-table">
+          <% if (categories && categories.length > 0) { %>
+            <% categories.forEach(cat => { %>
+              <div style="display: flex; align-items: center; padding: 16px 18px; border-bottom: 1px solid var(--border-color); gap: 16px; transition: background 0.15s;">
+                <!-- Icon -->
+                <div style="font-size: 2rem; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(245, 158, 11, 0.12); border-radius: 50%; flex-shrink: 0;">
+                  <%= cat.icon || '💬' %>
+                </div>
+
+                <!-- Tên & Mô tả -->
+                <div style="flex: 1; min-width: 0;">
+                  <h3 style="margin-bottom: 4px; font-size: 1.05rem;">
+                    <a href="/forum/categories/<%= cat.slug %>" style="color: var(--text-main); font-weight: 700;">
+                      <%= cat.name %>
+                    </a>
+                  </h3>
+                  <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; margin: 0;">
+                    <%= cat.description %>
+                  </p>
+                </div>
+
+                <!-- Thống kê số lượng -->
+                <div style="text-align: center; min-width: 90px; font-size: 0.82rem; color: var(--text-muted); border-left: 1px solid var(--border-color); border-right: 1px solid var(--border-color); padding: 0 12px; flex-shrink: 0;">
+                  <div style="font-weight: 700; color: var(--accent-link); font-size: 1rem;"><%= cat.total_posts || 0 %></div>
+                  <div style="font-size: 0.72rem;">Chủ đề</div>
+                  <div style="font-size: 0.72rem; margin-top: 2px;"><%= cat.total_replies || 0 %> phản hồi</div>
+                </div>
+
+                <!-- Bài viết mới nhất -->
+                <div style="width: 220px; font-size: 0.8rem; flex-shrink: 0;">
+                  <% if (cat.latest_post_title) { %>
+                    <div style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                      <a href="/forum/posts/<%= cat.latest_post_slug %>" style="color: var(--accent-blue);" title="<%= cat.latest_post_title %>">
+                        <%= cat.latest_post_title %>
+                      </a>
+                    </div>
+                    <div style="color: var(--text-muted); font-size: 0.72rem; margin-top: 3px;">
+                      <span>Bởi: <strong><%= cat.latest_post_author %></strong></span>
+                    </div>
+                  <% } else { %>
+                    <span style="color: var(--text-muted); font-style: italic;">Chưa có bài viết</span>
+                  <% } %>
+                </div>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Bài viết nổi bật & thảo luận sôi nổi -->
+      <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm);">
+        <div style="background-color: var(--bg-card-header); padding: 12px 18px; border-bottom: 1px solid var(--border-color); font-weight: 700; font-size: 0.95rem; color: var(--text-main); display: flex; align-items: center; justify-content: space-between;">
+          <span>🔥 BÀI VIẾT THẢO LUẬN NỔI BẬT</span>
+        </div>
+
+        <div>
+          <% if (hotPosts && hotPosts.length > 0) { %>
+            <% hotPosts.forEach(post => { %>
+              <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--border-color); gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+                  <span style="background-color: rgba(245, 158, 11, 0.15); color: var(--accent-link); font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; white-space: nowrap;">
+                    <%= post.category_name %>
+                  </span>
+                  <% if (post.is_pinned) { %>
+                    <span style="background-color: #ef4444; color: #ffffff; font-size: 0.7rem; font-weight: 700; padding: 1px 6px; border-radius: 3px;">GHIM</span>
+                  <% } %>
+                  <a href="/forum/posts/<%= post.slug %>" style="font-weight: 600; font-size: 0.9rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    <%= post.title %>
+                  </a>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 14px; font-size: 0.78rem; color: var(--text-muted); flex-shrink: 0;">
+                  <span>👤 <%= post.username %></span>
+                  <span>👁️ <%= post.views %></span>
+                  <span>💬 <%= post.reply_count %></span>
+                </div>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR DIỄN ĐÀN: THỐNG KÊ & TIỆN ÍCH -->
+    <aside>
+      <!-- Khung Thống kê Diễn Đàn -->
+      <div class="sidebar-card" style="margin-bottom: 20px;">
+        <div class="sidebar-card-header">
+          <span>📊</span> Thống kê diễn đàn
+        </div>
+        <div style="padding: 16px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: center; margin-bottom: 14px;">
+            <div style="background-color: var(--bg-body); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+              <div style="font-size: 1.3rem; font-weight: 800; color: var(--accent-link);"><%= stats.totalPosts %></div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Chủ đề bài viết</div>
+            </div>
+            <div style="background-color: var(--bg-body); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+              <div style="font-size: 1.3rem; font-weight: 800; color: var(--accent-blue);"><%= stats.totalReplies %></div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Bình luận thảo luận</div>
+            </div>
+          </div>
+
+          <div style="font-size: 0.85rem; color: var(--text-main); display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--border-color); pt-3; padding-top: 12px;">
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-muted);">👥 Tổng thành viên:</span>
+              <strong><%= stats.totalUsers %></strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-muted);">✨ Thành viên mới nhất:</span>
+              <strong style="color: var(--accent-link);"><%= stats.newestUser %></strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Khung Nội quy diễn đàn -->
+      <div class="sidebar-card">
+        <div class="sidebar-card-header">
+          <span>📜</span> Nội quy diễn đàn
+        </div>
+        <div style="padding: 14px; font-size: 0.82rem; color: var(--text-muted); line-height: 1.6;">
+          <p style="margin-bottom: 8px;">1. Văn minh, lịch sự trong ngôn từ thảo luận.</p>
+          <p style="margin-bottom: 8px;">2. Tôn trọng bản quyền tác giả và công sức sáng tác.</p>
+          <p style="margin-bottom: 8px;">3. Không đăng bài spam, quảng cáo trái phép.</p>
+          <p style="margin-bottom: 0;">4. Tích cực chia sẻ kiến thức, góp ý xây dựng tác phẩm.</p>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<%- include('../../partials/footer') %>

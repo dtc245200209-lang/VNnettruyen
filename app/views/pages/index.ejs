@@ -136,36 +136,35 @@
 
     <!-- 3.4. Bảng 2 cột: Hoạt Động Mới & Chương Mới (Vnkings layout) -->
     <div class="two-col-updates-grid">
-      <!-- Cột Trái: Hoạt động mới / Thảo luận -->
+      <!-- Cột Trái: Hoạt động diễn đàn mới / Thảo luận -->
       <div class="update-box">
         <div class="update-box-header">
-          <span>💬 Hoạt động mới</span>
-          <a href="/stories">Xem thêm</a>
+          <span>💬 Thảo luận diễn đàn</span>
+          <a href="/forum">Vào diễn đàn &raquo;</a>
         </div>
         <div>
-          <% if (recentComments && recentComments.length > 0) { %>
-            <% recentComments.forEach(c => { %>
+          <% if (typeof forumPosts !== 'undefined' && forumPosts && forumPosts.length > 0) { %>
+            <% forumPosts.forEach(p => { %>
               <div class="update-item-row">
-                <img src="<%= c.avatar || '/public/images/logo.png' %>" alt="<%= c.username %>" class="update-thumb" style="border-radius: 50%; width: 36px; height: 36px;" onerror="this.src='/public/images/logo.png'">
-                <div style="flex: 1;">
+                <img src="<%= p.avatar || '/public/images/logo.png' %>" alt="<%= p.username %>" class="update-thumb" style="border-radius: 50%; width: 36px; height: 36px;" onerror="this.src='/public/images/logo.png'">
+                <div style="flex: 1; min-width: 0;">
                   <div>
-                    <span class="tag-badge tag-badge-orange">[<%= c.genre_name || 'Văn Học' %>]</span>
-                    <a href="/stories/<%= c.story_slug %>" style="font-weight: 700;">
-                      <%= c.story_title %>
+                    <span class="tag-badge tag-badge-orange">[<%= p.category_name %>]</span>
+                    <a href="/forum/posts/<%= p.slug %>" style="font-weight: 700; color: var(--text-main);">
+                      <%= p.title %>
                     </a>
                   </div>
-                  <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
-                    <span style="color: #e11d48; font-weight: 600;">Bình luận:</span> <strong><%= c.username %></strong>
-                  </div>
-                  <div style="font-size: 0.8rem; color: var(--text-main); margin-top: 2px;">
-                    "<%= c.content.slice(0, 65) %>..."
+                  <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 3px; display: flex; gap: 10px;">
+                    <span>✍️ <%= p.username %></span>
+                    <span>💬 <%= p.reply_count || 0 %> trả lời</span>
+                    <span>👁️ <%= p.views || 0 %> xem</span>
                   </div>
                 </div>
               </div>
             <% }) %>
           <% } else { %>
             <div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
-              Chưa có bình luận mới.
+              Chưa có bài thảo luận mới.
             </div>
           <% } %>
         </div>
@@ -206,6 +205,29 @@
             </div>
           <% } %>
         </div>
+      </div>
+    </div>
+
+    <!-- 3.4.1. BẢNG CHUYÊN MỤC DIỄN ĐÀN (Forum Categories Showcase) -->
+    <div class="update-box" style="margin-bottom: 20px;">
+      <div class="update-box-header">
+        <span>📋 CHUYÊN MỤC THẢO LUẬN DIỄN ĐÀN</span>
+        <a href="/forum">Vào diễn đàn &raquo;</a>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; padding: 14px;">
+        <% if (typeof forumCategories !== 'undefined' && forumCategories && forumCategories.length > 0) { %>
+          <% forumCategories.forEach(cat => { %>
+            <div style="border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; background-color: var(--bg-card); display: flex; align-items: center; gap: 12px; transition: transform 0.15s;">
+              <span style="font-size: 1.8rem;"><%= cat.icon || '💬' %></span>
+              <div style="flex: 1; min-width: 0;">
+                <a href="/forum/categories/<%= cat.slug %>" style="font-weight: 700; font-size: 0.92rem; color: var(--text-main); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  <%= cat.name %>
+                </a>
+                <span style="font-size: 0.75rem; color: var(--text-muted);"><%= cat.post_count || 0 %> chủ đề</span>
+              </div>
+            </div>
+          <% }) %>
+        <% } %>
       </div>
     </div>
 
@@ -258,11 +280,32 @@
       </div>
     </div>
 
-    <!-- Widget 2: VNnet Farm Banner -->
-    <div class="sidebar-card" id="farm" style="padding: 0; overflow: hidden;">
-      <a href="/stories">
-        <img src="/public/images/farm-banner.jpg" alt="VNnet Farm" style="width: 100%; display: block;">
-      </a>
+    <!-- Widget 2: Thống Kê Diễn Đàn & Thành Viên Tích Cực -->
+    <div class="sidebar-card">
+      <div class="sidebar-title">📊 Diễn đàn VNnettruyen</div>
+      <div style="font-size: 0.85rem; display: flex; flex-direction: column; gap: 8px; padding-top: 4px;">
+        <% if (typeof forumStats !== 'undefined') { %>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-muted);">👥 Tổng thành viên:</span>
+            <strong><%= forumStats.totalUsers %></strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-muted);">💬 Chủ đề bài viết:</span>
+            <strong style="color: var(--accent-blue);"><%= forumStats.totalPosts %></strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-muted);">📚 Tác phẩm truyện:</span>
+            <strong style="color: var(--accent-link);"><%= forumStats.totalStories %></strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; border-top: 1px dashed var(--border-color); padding-top: 6px;">
+            <span style="color: var(--text-muted);">✨ Thành viên mới:</span>
+            <strong><%= forumStats.latestMember %></strong>
+          </div>
+        <% } %>
+        <a href="/forum/create" class="btn btn-primary btn-sm" style="margin-top: 6px; text-align: center; font-weight: 700;">
+          ✏️ Đăng bài thảo luận
+        </a>
+      </div>
     </div>
 
     <!-- Widget 3: Điểm Danh Hằng Ngày Nhận Xu -->

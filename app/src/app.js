@@ -20,6 +20,7 @@ const indexRoutes = require('./routes/index');
 const authRoutes = require('./routes/auth');
 const authorRoutes = require('./routes/author');
 const adminRoutes = require('./routes/admin');
+const forumRoutes = require('./routes/forum');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -153,6 +154,7 @@ app.get('/metrics', async (req, res) => {
 
 // 12. Mount Routes
 app.use('/', indexRoutes);
+app.use('/forum', forumRoutes);
 app.use('/auth', authRoutes);
 app.use('/author', authorRoutes);
 app.use('/admin', adminRoutes);

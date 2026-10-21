@@ -32,9 +32,12 @@
 
       <!-- Khu vực nút chức năng & Tài khoản thành viên -->
       <div class="header-auth-actions">
-        <a href="/author/stories/create" class="header-btn header-btn-post">
-          <span>➕</span> Đăng bài
-        </a>
+        <!-- Nút Đăng Bài (Tùy chọn Diễn Đàn hoặc Viết Truyện) -->
+        <div style="position: relative; display: inline-block;" class="post-btn-group">
+          <a href="/forum/create" class="header-btn header-btn-post" style="border-radius: var(--radius-sm);">
+            <span>➕</span> Đăng bài
+          </a>
+        </div>
 
         <% if (currentUser) { %>
           <a href="/profile" class="header-btn" style="background-color: rgba(255, 255, 255, 0.2);">
@@ -42,7 +45,7 @@
             <span>👤 <%= currentUser.username %></span>
           </a>
           <% if (currentUser.role === 'admin') { %>
-            <a href="/admin" class="header-btn" style="background-color: #ef4444;">🛡️ Admin</a>
+            <a href="/admin" class="header-btn" style="background-color: #ef4444;">🛡️ Quản trị</a>
           <% } %>
           <a href="/auth/logout" class="header-btn" title="Đăng xuất">Đăng xuất</a>
         <% } else { %>
@@ -66,6 +69,12 @@
       <ul class="main-nav-list">
         <li class="main-nav-item">
           <a href="/" class="main-nav-link <%= currentPath === '/' ? 'active' : '' %>">Trang chủ</a>
+        </li>
+
+        <li class="main-nav-item">
+          <a href="/forum" class="main-nav-link <%= currentPath.startsWith('/forum') ? 'active' : '' %>" style="color: #fbbf24; font-weight: 700;">
+            💬 Diễn Đàn
+          </a>
         </li>
 
         <li class="main-nav-item">
@@ -125,10 +134,6 @@
 
         <li class="main-nav-item">
           <a href="/stories?sort=views" class="main-nav-link">Bảng Xếp Hạng</a>
-        </li>
-
-        <li class="main-nav-item" style="margin-left: auto;">
-          <a href="#farm" class="main-nav-link main-nav-link-farm">VNnet Farm</a>
         </li>
       </ul>
     </div>
