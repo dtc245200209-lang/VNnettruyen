@@ -216,16 +216,16 @@ CREATE TABLE `forum_replies` (
 
 -- ===================================================
 -- DỮ LIỆU MẪU KHỞI TẠO (SEED DATA)
--- Mật khẩu mặc định:
--- admin: Admin@123456
--- tacgia_viet: Author@123456
--- docgia_vn: Reader@123456
+-- Mật khẩu mặc định: 123456 (hoặc Admin@123456, Author@123456, Reader@123456)
+-- admin: 123456
+-- tacgia_viet: 123456
+-- docgia_vn: 123456
 -- ===================================================
 
 INSERT INTO `users` (`id`, `username`, `email`, `password`, `role`, `coins`, `bio`) VALUES
-(1, 'admin', 'admin@vnnettruyen.vn', '$2a$10$Nf6M/sI/CvRT6CMOpN0V1O.5qjg6MNu2eFz8kyHuyBw1OZW2tmw7S', 'admin', 500, 'Quản trị viên diễn đàn VNnettruyen - Hỗ trợ cộng đồng sáng tác'),
-(2, 'tacgia_viet', 'author@vnnettruyen.vn', '$2a$10$TsecfGtT9maTbSZN6wxnUO0LFYx0Fm3bPAALcylPssgdnqdKy5ow2', 'author', 250, 'Tác giả sáng tác dã sử, kiếm hiệp và huyền huyễn Việt Nam'),
-(3, 'docgia_vn', 'reader@vnnettruyen.vn', '$2a$10$OtEWI1Pj1wge5/A0AQo.qOGPK1.7fsvRtFresEFd71HZlcm21YLX.', 'reader', 120, 'Độc giả đam mê văn học mạng và tiểu thuyết kỳ ảo');
+(1, 'admin', 'admin@vnnettruyen.vn', '$2a$10$hUDBVbJCiwdiA4Okox8qtOmrpnpSulIm.Hcl7oXSHSGM.t9rj4cD6', 'admin', 500, 'Quản trị viên diễn đàn VNnettruyen - Hỗ trợ cộng đồng sáng tác'),
+(2, 'tacgia_viet', 'author@vnnettruyen.vn', '$2a$10$hUDBVbJCiwdiA4Okox8qtOmrpnpSulIm.Hcl7oXSHSGM.t9rj4cD6', 'author', 250, 'Tác giả sáng tác dã sử, kiếm hiệp và huyền huyễn Việt Nam'),
+(3, 'docgia_vn', 'reader@vnnettruyen.vn', '$2a$10$hUDBVbJCiwdiA4Okox8qtOmrpnpSulIm.Hcl7oXSHSGM.t9rj4cD6', 'reader', 120, 'Độc giả đam mê văn học mạng và tiểu thuyết kỳ ảo');
 
 -- 7 THỂ LOẠI TRUYỆN CHÍNH (THEO YÊU CẦU: Truyện ngắn, Tình Cảm, Dị giới, Xuyên không, Tiên hiệp, Đô thị, Kiếm hiệp)
 INSERT INTO `genres` (`id`, `name`, `slug`, `description`) VALUES
