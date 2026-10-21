@@ -10,7 +10,7 @@ Mỗi file Word (.docx) hoặc Text (.txt) bạn viết theo cấu trúc cực k
 
 ```text
 Tiêu đề: Thăng Long Kiếm Hiệp Ký
-Tác giả: Meovangnho
+Tác giả: Meovangnho   (tên tài khoản sở hữu truyện)
 Thể loại: Kiếm Hiệp
 Mô tả: Câu chuyện kiếm khách chốn kinh kỳ Thăng Long thời loạn thế, hành hiệp trượng nghĩa bảo vệ giang sơn.
 

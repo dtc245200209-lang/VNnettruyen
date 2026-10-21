@@ -62,6 +62,7 @@ CREATE TABLE `stories` (
   `title` VARCHAR(255) NOT NULL,
   `slug` VARCHAR(255) NOT NULL UNIQUE,
   `author_id` INT NOT NULL,
+  `pen_name` VARCHAR(100) NULL,
   `description` TEXT NOT NULL,
   `cover_image` VARCHAR(255) DEFAULT '/public/images/cover-1.jpg',
   `status` ENUM('ongoing', 'completed') DEFAULT 'ongoing',
@@ -215,9 +216,9 @@ CREATE TABLE `forum_replies` (
 
 INSERT INTO `users` (`id`, `username`, `email`, `password`, `role`, `coins`, `bio`) VALUES
 (1, 'admin', 'admin@vnnettruyen.vn', '$2a$10$hUDBVbJCiwdiA4Okox8qtOmrpnpSulIm.Hcl7oXSHSGM.t9rj4cD6', 'admin', 0, 'Quản trị viên diễn đàn VNnettruyen - Hỗ trợ cộng đồng sáng tác'),
-(2, 'tacgia_viet', 'author@vnnettruyen.vn', '$2a$10$hUDBVbJCiwdiA4Okox8qtOmrpnpSulIm.Hcl7oXSHSGM.t9rj4cD6', 'author', 0, 'Tác giả sáng tác dã sử, kiếm hiệp và huyền huyễn Việt Nam'),
-(3, 'docgia_vn', 'reader@vnnettruyen.vn', '$2a$10$hUDBVbJCiwdiA4Okox8qtOmrpnpSulIm.Hcl7oXSHSGM.t9rj4cD6', 'reader', 0, 'Độc giả đam mê văn học mạng và tiểu thuyết kỳ ảo'),
-(4, 'Meovangnho', 'Nami241@gmail.com', '$2a$10$hUDBVbJCiwdiA4Okox8qtOmrpnpSulIm.Hcl7oXSHSGM.t9rj4cD6', 'author', 0, 'Thành viên đam mê đọc và sáng tác truyện kiếm hiệp');
+(2, 'ThanhPhongKiemKhach', 'thanhphong@vnnettruyen.vn', '$2a$10$hUDBVbJCiwdiA4Okox8qtOmrpnpSulIm.Hcl7oXSHSGM.t9rj4cD6', 'author', 0, 'Tác giả sáng tác dã sử, kiếm hiệp và huyền huyễn Việt Nam'),
+(3, 'MinhNguyetDocGia', 'minhnguyet@vnnettruyen.vn', '$2a$10$hUDBVbJCiwdiA4Okox8qtOmrpnpSulIm.Hcl7oXSHSGM.t9rj4cD6', 'reader', 0, 'Độc giả thân thiết & nhà phê bình văn học tại VNnettruyen'),
+(4, 'Meovangnho', 'Nami241@gmail.com', '$2a$10$hUDBVbJCiwdiA4Okox8qtOmrpnpSulIm.Hcl7oXSHSGM.t9rj4cD6', 'reader', 0, 'Thành viên cộng đồng đam mê đọc và thảo luận truyện');
 
 -- 6 THỂ LOẠI TRUYỆN CHÍNH (ĐÃ BỎ TIÊN HIỆP THEO YÊU CẦU)
 INSERT INTO `genres` (`id`, `name`, `slug`, `description`) VALUES

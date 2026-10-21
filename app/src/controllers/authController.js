@@ -27,9 +27,16 @@ exports.postLogin = async (req, res) => {
   }
 
   try {
+    // Hỗ trợ đăng nhập linh hoạt cả tên mới và tên cũ
+    let aliasAccount = account;
+    if (account.toLowerCase() === 'tacgia_viet') aliasAccount = 'ThanhPhongKiemKhach';
+    if (account.toLowerCase() === 'docgia_vn') aliasAccount = 'MinhNguyetDocGia';
+    if (account.toLowerCase() === 'thanhphongkiemkhach') aliasAccount = 'ThanhPhongKiemKhach';
+    if (account.toLowerCase() === 'minhnguyetdocgia') aliasAccount = 'MinhNguyetDocGia';
+
     const [rows] = await db.query(
-      'SELECT * FROM users WHERE username = ? OR email = ? LIMIT 1',
-      [account, account]
+      'SELECT * FROM users WHERE username = ? OR username = ? OR email = ? LIMIT 1',
+      [account, aliasAccount, account]
     );
 
     if (rows.length === 0) {
@@ -47,9 +54,9 @@ exports.postLogin = async (req, res) => {
         isMatch = true;
       } else if (user.username === 'admin' && (password === 'admin' || password === 'Admin@123456')) {
         isMatch = true;
-      } else if (user.username === 'tacgia_viet' && (password === 'author' || password === 'Author@123456')) {
+      } else if (['ThanhPhongKiemKhach', 'tacgia_viet'].includes(user.username) && (password === 'author' || password === 'Author@123456')) {
         isMatch = true;
-      } else if (user.username === 'docgia_vn' && (password === 'reader' || password === 'Reader@123456')) {
+      } else if (['MinhNguyetDocGia', 'docgia_vn'].includes(user.username) && (password === 'reader' || password === 'Reader@123456')) {
         isMatch = true;
       }
     }
@@ -211,7 +218,7 @@ exports.getProfile = async (req, res) => {
 
     // Lấy tủ sách / truyện yêu thích
     const [favorites] = await db.query(`
-      SELECT s.id, s.title, s.slug, s.cover_image, s.status, u.username AS author_name,
+      SELECT s.id, s.title, s.slug, s.cover_image, s.status, COALESCE(NULLIF(s.pen_name, ''), u.username) AS author_name,
              (SELECT COUNT(*) FROM chapters WHERE story_id = s.id AND status = 'published') AS total_chapters
       FROM favorites f
       JOIN stories s ON f.story_id = s.id

@@ -33,7 +33,7 @@ async function parseDocument(filePath) {
   // Phân tích header và các chương
   const lines = text.split(/\r?\n/);
   let title = '';
-  let authorName = 'tacgia_viet';
+  let authorName = 'PhongVanKhach';
   let genreName = 'Truyện Ngắn';
   let description = '';
   let coverImage = '/public/images/cover-1.jpg';
@@ -150,7 +150,7 @@ async function importAllStories() {
       }
 
       // 1. Tìm hoặc tạo tác giả
-      let authorId = 2; // Mặc định tacgia_viet
+      let authorId = 2; // Mặc định PhongVanKhach
       const [userRows] = await db.query('SELECT id FROM users WHERE username = ? LIMIT 1', [parsed.authorName]);
       if (userRows.length > 0) {
         authorId = userRows[0].id;
@@ -183,17 +183,17 @@ async function importAllStories() {
         storyId = existingStory[0].id;
         await db.query(`
           UPDATE stories 
-          SET title = ?, description = ?, status = ?, updated_at = NOW()
+          SET title = ?, author_id = ?, pen_name = ?, description = ?, status = ?, updated_at = NOW()
           WHERE id = ?
-        `, [parsed.title, parsed.description, parsed.status, storyId]);
-        console.log(`  -> Cập nhật truyện ID: ${storyId}`);
+        `, [parsed.title, authorId, parsed.authorName, parsed.description, parsed.status, storyId]);
+        console.log(`  -> Cập nhật truyện ID: ${storyId} (Tác giả: ${parsed.authorName}, ID: ${authorId})`);
       } else {
         const [insertStory] = await db.query(`
-          INSERT INTO stories (title, slug, author_id, description, cover_image, status, views, is_featured)
-          VALUES (?, ?, ?, ?, ?, ?, 100, 1)
-        `, [parsed.title, storySlug, authorId, parsed.description, parsed.coverImage, parsed.status]);
+          INSERT INTO stories (title, slug, author_id, pen_name, description, cover_image, status, views, is_featured)
+          VALUES (?, ?, ?, ?, ?, ?, ?, 100, 1)
+        `, [parsed.title, storySlug, authorId, parsed.authorName, parsed.description, parsed.coverImage, parsed.status]);
         storyId = insertStory.insertId;
-        console.log(`  -> Tạo mới truyện ID: ${storyId}`);
+        console.log(`  -> Tạo mới truyện ID: ${storyId} (Tác giả: ${parsed.authorName}, ID: ${authorId})`);
       }
 
       // Gán thể loại

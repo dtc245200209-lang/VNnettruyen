@@ -154,7 +154,7 @@ exports.getStories = async (req, res) => {
     }
 
     const [stories] = await db.query(`
-      SELECT s.*, u.username AS author_name,
+      SELECT s.*, COALESCE(NULLIF(s.pen_name, ''), u.username) AS author_name,
              (SELECT COUNT(*) FROM chapters WHERE story_id = s.id) AS chapter_count,
              (SELECT COUNT(*) FROM comments WHERE story_id = s.id) AS comment_count
       FROM stories s

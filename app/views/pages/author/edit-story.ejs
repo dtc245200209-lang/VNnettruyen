@@ -6,10 +6,18 @@
   </div>
 
   <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 30px;">
-    <form action="/author/stories/<%= story.id %>/edit" method="POST">
+    <form action="/author/stories/<%= story.id %>/edit" method="POST" enctype="multipart/form-data">
       <div class="form-group">
-        <label class="form-label">Tên truyện <span style="color: var(--danger);">*</span></label>
+        <label class="form-label">Tên tác phẩm <span style="color: var(--danger);">*</span></label>
         <input type="text" name="title" class="form-control" value="<%= story.title %>" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tên tác giả / Bút danh hiển thị</label>
+        <input type="text" name="pen_name" class="form-control" value="<%= story.pen_name || '' %>" placeholder="Để trống nếu muốn dùng tên tài khoản, hoặc nhập bút danh riêng...">
+        <small style="color: var(--text-muted); font-size: 0.78rem; display: block; margin-top: 4px;">
+          Bút danh này sẽ được in trang trọng trên trang đọc truyện và danh sách tác phẩm thay cho tên tài khoản.
+        </small>
       </div>
 
       <div class="form-group">
@@ -29,9 +37,22 @@
         <textarea name="description" class="form-control" rows="6" required><%= story.description %></textarea>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Đường dẫn ảnh bìa (Cover Image URL)</label>
-        <input type="text" name="cover_image" class="form-control" value="<%= story.cover_image %>">
+      <div class="form-group" style="background-color: var(--bg-secondary); padding: 16px; border-radius: var(--radius-md); border: 1px dashed var(--border-color);">
+        <label class="form-label" style="font-weight: 700;">🖼️ Ảnh bìa tác phẩm (Cover Image)</label>
+        
+        <div style="display: flex; gap: 16px; align-items: flex-start; margin-bottom: 12px;">
+          <img src="<%= story.cover_image %>" alt="<%= story.title %>" style="width: 70px; height: 100px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color);" onerror="this.src='/public/images/cover-1.jpg'">
+          <div style="flex: 1;">
+            <label style="font-size: 0.82rem; font-weight: 600; display: block; margin-bottom: 4px;">1. Tải ảnh mới từ máy tính của bạn:</label>
+            <input type="file" name="cover_file" class="form-control" accept="image/*" style="padding: 6px;">
+            <small style="color: var(--text-muted); font-size: 0.75rem;">Định dạng: JPG, PNG, WEBP, GIF (Tối đa 5MB). Chọn ảnh để thay thế ảnh bìa hiện tại.</small>
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size: 0.82rem; font-weight: 600; display: block; margin-bottom: 4px;">2. Hoặc nhập đường dẫn ảnh (URL):</label>
+          <input type="text" name="cover_image" class="form-control" value="<%= story.cover_image %>">
+        </div>
       </div>
 
       <div class="form-group">

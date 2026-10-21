@@ -14,7 +14,7 @@ exports.getHome = async (req, res) => {
   try {
     // 1. Top View Tuần (Dải sách ngang trên cùng - Chỉ lấy truyện đã có chương)
     const [topWeeklyStories] = await db.query(`
-      SELECT s.id, s.title, s.slug, s.cover_image, s.views, u.username AS author_name,
+      SELECT s.id, s.title, s.slug, s.cover_image, s.views, COALESCE(NULLIF(s.pen_name, ''), u.username) AS author_name,
              (SELECT COUNT(*) FROM chapters WHERE story_id = s.id AND status = 'published') AS total_chapters
       FROM stories s
       JOIN users u ON s.author_id = u.id
@@ -26,7 +26,7 @@ exports.getHome = async (req, res) => {
     // 2. Tác phẩm tiêu biểu (Spotlight Banner - Bắt buộc có chương)
     const [spotlightRows] = await db.query(`
       SELECT s.id, s.title, s.slug, s.cover_image, s.description, s.views,
-             u.username AS author_name,
+             COALESCE(NULLIF(s.pen_name, ''), u.username) AS author_name,
              (SELECT name FROM genres g JOIN story_genres sg ON g.id = sg.genre_id WHERE sg.story_id = s.id LIMIT 1) AS primary_genre,
              (SELECT COUNT(*) FROM chapters WHERE story_id = s.id AND status = 'published') AS total_chapters
       FROM stories s
@@ -45,7 +45,7 @@ exports.getHome = async (req, res) => {
     const [latestChapters] = await db.query(`
       SELECT c.id, c.chapter_number, c.title AS chapter_title, c.updated_at,
              s.title AS story_title, s.slug AS story_slug,
-             u.username AS author_name,
+             COALESCE(NULLIF(s.pen_name, ''), u.username) AS author_name,
              (SELECT name FROM genres g JOIN story_genres sg ON g.id = sg.genre_id WHERE sg.story_id = s.id LIMIT 1) AS genre_name
       FROM chapters c
       JOIN stories s ON c.story_id = s.id
@@ -110,7 +110,7 @@ exports.getHome = async (req, res) => {
 
     // 9. Bảng xếp hạng (Chỉ hiển thị truyện đã có chương)
     const [rankingStories] = await db.query(`
-      SELECT s.id, s.title, s.slug, s.cover_image, s.views, u.username AS author_name,
+      SELECT s.id, s.title, s.slug, s.cover_image, s.views, COALESCE(NULLIF(s.pen_name, ''), u.username) AS author_name,
              (SELECT COUNT(*) FROM chapters WHERE story_id = s.id AND status = 'published') AS total_chapters
       FROM stories s
       JOIN users u ON s.author_id = u.id
@@ -200,7 +200,7 @@ exports.getStories = async (req, res) => {
 
     const storiesSql = `
       SELECT s.id, s.title, s.slug, s.cover_image, s.status, s.views, s.updated_at,
-             u.username AS author_name,
+             COALESCE(NULLIF(s.pen_name, ''), u.username) AS author_name,
              (SELECT COUNT(*) FROM chapters WHERE story_id = s.id AND status = 'published') AS total_chapters,
              (SELECT title FROM chapters WHERE story_id = s.id AND status = 'published' ORDER BY chapter_number DESC LIMIT 1) AS latest_chapter_title,
              (SELECT chapter_number FROM chapters WHERE story_id = s.id AND status = 'published' ORDER BY chapter_number DESC LIMIT 1) AS latest_chapter_number,
@@ -244,7 +244,7 @@ exports.getStoryDetail = async (req, res) => {
 
   try {
     const [stories] = await db.query(`
-      SELECT s.*, u.username AS author_name, u.avatar AS author_avatar,
+      SELECT s.*, COALESCE(NULLIF(s.pen_name, ''), u.username) AS author_name, u.avatar AS author_avatar,
              GROUP_CONCAT(DISTINCT g.name SEPARATOR '||') AS genre_names,
              GROUP_CONCAT(DISTINCT g.slug SEPARATOR '||') AS genre_slugs
       FROM stories s

@@ -30,6 +30,7 @@
     "helmet": "^7.1.0",
     "mammoth": "^1.13.0",
     "morgan": "^1.10.0",
+    "multer": "^2.4.0",
     "mysql2": "^3.9.7",
     "prom-client": "^15.1.2",
     "sanitize-html": "^2.13.0",

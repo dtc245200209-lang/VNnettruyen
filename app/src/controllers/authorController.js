@@ -54,7 +54,7 @@ exports.getCreateStory = async (req, res) => {
 // 3. Xử lý Đăng truyện mới
 exports.postCreateStory = async (req, res) => {
   const userId = req.session.user.id;
-  const { title, description, cover_image, status, genre_ids } = req.body;
+  const { title, pen_name, description, cover_image, status, genre_ids } = req.body;
 
   if (!title || !description) {
     req.flash('error_msg', 'Tên truyện và tóm tắt nội dung không được để trống!');
@@ -70,15 +70,24 @@ exports.postCreateStory = async (req, res) => {
       slug = `${slug}-${Date.now().toString().slice(-4)}`;
     }
 
+    // Xử lý ảnh bìa: ưu tiên file tải lên từ máy tính, sau đó đến URL
+    let finalCover = cover_image && cover_image.trim() !== '' ? cover_image.trim() : '/public/images/default-cover.png';
+    if (req.file) {
+      finalCover = `/public/uploads/covers/${req.file.filename}`;
+    }
+
+    const finalPenName = (pen_name && pen_name.trim() !== '') ? pen_name.trim() : null;
+
     const [result] = await db.query(`
-      INSERT INTO stories (title, slug, author_id, description, cover_image, status)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO stories (title, slug, author_id, pen_name, description, cover_image, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `, [
       title.trim(),
       slug,
       userId,
+      finalPenName,
       description.trim(),
-      cover_image && cover_image.trim() !== '' ? cover_image.trim() : '/public/images/default-cover.png',
+      finalCover,
       status || 'ongoing'
     ]);
 
@@ -92,7 +101,7 @@ exports.postCreateStory = async (req, res) => {
       }
     }
 
-    logger.info(`Tác giả ID ${userId} vừa tạo tác phẩm mới: ${title} (ID: ${storyId})`);
+    logger.info(`Tác giả ID ${userId} (${req.session.user.username}) vừa tạo tác phẩm mới: ${title} (Bút danh: ${finalPenName || 'Mặc định'}, ID: ${storyId})`);
     req.flash('success_msg', 'Chúc mừng bạn đã tạo tác phẩm mới thành công! Giờ hãy bắt đầu viết chương 1 nhé.');
     res.redirect(`/author/stories/${storyId}/chapters`);
   } catch (err) {
@@ -116,8 +125,9 @@ exports.getEditStory = async (req, res) => {
     }
 
     const story = stories[0];
-    if (story.author_id !== userId && userRole !== 'admin') {
-      req.flash('error_msg', 'Bạn không có quyền chỉnh sửa truyện của người khác!');
+    if (Number(story.author_id) !== Number(userId) && userRole !== 'admin') {
+      logger.warn(`Từ chối quyền: User ID ${userId} (${req.session.user.username}) cố gắng truy cập chỉnh sửa truyện ID ${storyId} của tác giả ID ${story.author_id}`);
+      req.flash('error_msg', 'Bạn không có quyền chỉnh sửa tác phẩm của tác giả khác!');
       return res.redirect('/author');
     }
 
@@ -143,7 +153,7 @@ exports.postEditStory = async (req, res) => {
   const { storyId } = req.params;
   const userId = req.session.user.id;
   const userRole = req.session.user.role;
-  const { title, description, cover_image, status, genre_ids } = req.body;
+  const { title, pen_name, description, cover_image, status, genre_ids } = req.body;
 
   try {
     const [stories] = await db.query('SELECT * FROM stories WHERE id = ?', [storyId]);
@@ -152,19 +162,29 @@ exports.postEditStory = async (req, res) => {
       return res.redirect('/author');
     }
 
-    if (stories[0].author_id !== userId && userRole !== 'admin') {
-      req.flash('error_msg', 'Từ chối quyền chỉnh sửa!');
+    if (Number(stories[0].author_id) !== Number(userId) && userRole !== 'admin') {
+      logger.warn(`Từ chối cập nhật: User ID ${userId} (${req.session.user.username}) cố gắng sửa truyện ID ${storyId} của tác giả ID ${stories[0].author_id}`);
+      req.flash('error_msg', 'Bạn không có quyền chỉnh sửa tác phẩm của người khác!');
       return res.redirect('/author');
     }
 
+    // Xử lý ảnh bìa: ưu tiên file tải lên từ máy tính
+    let finalCover = cover_image && cover_image.trim() !== '' ? cover_image.trim() : (stories[0].cover_image || '/public/images/default-cover.png');
+    if (req.file) {
+      finalCover = `/public/uploads/covers/${req.file.filename}`;
+    }
+
+    const finalPenName = (pen_name && pen_name.trim() !== '') ? pen_name.trim() : null;
+
     await db.query(`
       UPDATE stories 
-      SET title = ?, description = ?, cover_image = ?, status = ?, updated_at = NOW()
+      SET title = ?, pen_name = ?, description = ?, cover_image = ?, status = ?, updated_at = NOW()
       WHERE id = ?
     `, [
       title.trim(),
+      finalPenName,
       description.trim(),
-      cover_image && cover_image.trim() !== '' ? cover_image.trim() : '/public/images/default-cover.png',
+      finalCover,
       status || 'ongoing',
       storyId
     ]);
@@ -178,6 +198,7 @@ exports.postEditStory = async (req, res) => {
       }
     }
 
+    logger.info(`Đã cập nhật tác phẩm ID ${storyId} bởi user ${userId} (${req.session.user.username})`);
     req.flash('success_msg', 'Cập nhật thông tin tác phẩm thành công!');
     res.redirect('/author');
   } catch (err) {
@@ -200,7 +221,8 @@ exports.deleteStory = async (req, res) => {
       return res.redirect('/author');
     }
 
-    if (stories[0].author_id !== userId && userRole !== 'admin') {
+    if (Number(stories[0].author_id) !== Number(userId) && userRole !== 'admin') {
+      logger.warn(`Từ chối xóa: User ID ${userId} (${req.session.user.username}) cố xóa tác phẩm ID ${storyId} của tác giả ID ${stories[0].author_id}`);
       req.flash('error_msg', 'Bạn không có quyền xóa tác phẩm này!');
       return res.redirect('/author');
     }
@@ -229,8 +251,9 @@ exports.getStoryChapters = async (req, res) => {
       return res.redirect('/author');
     }
 
-    if (stories[0].author_id !== userId && userRole !== 'admin') {
-      req.flash('error_msg', 'Từ chối quyền truy cập!');
+    if (Number(stories[0].author_id) !== Number(userId) && userRole !== 'admin') {
+      logger.warn(`Từ chối xem chương: User ID ${userId} (${req.session.user.username}) cố truy cập tác phẩm ID ${storyId} của tác giả ID ${stories[0].author_id}`);
+      req.flash('error_msg', 'Bạn không có quyền quản lý chương của tác phẩm này!');
       return res.redirect('/author');
     }
 
@@ -260,8 +283,8 @@ exports.getCreateChapter = async (req, res) => {
 
   try {
     const [stories] = await db.query('SELECT id, title, author_id FROM stories WHERE id = ?', [storyId]);
-    if (stories.length === 0 || (stories[0].author_id !== userId && userRole !== 'admin')) {
-      req.flash('error_msg', 'Không có quyền!');
+    if (stories.length === 0 || (Number(stories[0].author_id) !== Number(userId) && userRole !== 'admin')) {
+      req.flash('error_msg', 'Bạn không có quyền thêm chương cho tác phẩm này!');
       return res.redirect('/author');
     }
 
@@ -298,8 +321,8 @@ exports.postCreateChapter = async (req, res) => {
 
   try {
     const [stories] = await db.query('SELECT id, author_id FROM stories WHERE id = ?', [storyId]);
-    if (stories.length === 0 || (stories[0].author_id !== userId && userRole !== 'admin')) {
-      req.flash('error_msg', 'Từ chối quyền hạn!');
+    if (stories.length === 0 || (Number(stories[0].author_id) !== Number(userId) && userRole !== 'admin')) {
+      req.flash('error_msg', 'Từ chối quyền hạn thêm chương!');
       return res.redirect('/author');
     }
 
@@ -338,8 +361,8 @@ exports.getEditChapter = async (req, res) => {
 
   try {
     const [stories] = await db.query('SELECT id, title, author_id FROM stories WHERE id = ?', [storyId]);
-    if (stories.length === 0 || (stories[0].author_id !== userId && userRole !== 'admin')) {
-      req.flash('error_msg', 'Từ chối quyền hạn!');
+    if (stories.length === 0 || (Number(stories[0].author_id) !== Number(userId) && userRole !== 'admin')) {
+      req.flash('error_msg', 'Từ chối quyền hạn sửa chương!');
       return res.redirect('/author');
     }
 
@@ -370,8 +393,8 @@ exports.postEditChapter = async (req, res) => {
 
   try {
     const [stories] = await db.query('SELECT author_id FROM stories WHERE id = ?', [storyId]);
-    if (stories.length === 0 || (stories[0].author_id !== userId && userRole !== 'admin')) {
-      req.flash('error_msg', 'Từ chối quyền hạn!');
+    if (stories.length === 0 || (Number(stories[0].author_id) !== Number(userId) && userRole !== 'admin')) {
+      req.flash('error_msg', 'Từ chối quyền hạn sửa chương!');
       return res.redirect('/author');
     }
 
@@ -407,8 +430,8 @@ exports.deleteChapter = async (req, res) => {
 
   try {
     const [stories] = await db.query('SELECT author_id FROM stories WHERE id = ?', [storyId]);
-    if (stories.length === 0 || (stories[0].author_id !== userId && userRole !== 'admin')) {
-      req.flash('error_msg', 'Từ chối quyền hạn!');
+    if (stories.length === 0 || (Number(stories[0].author_id) !== Number(userId) && userRole !== 'admin')) {
+      req.flash('error_msg', 'Từ chối quyền hạn xóa chương!');
       return res.redirect('/author');
     }
 
