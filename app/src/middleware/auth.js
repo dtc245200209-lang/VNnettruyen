@@ -1,6 +1,18 @@
-// Middleware kiểm tra và phân quyền người dùng
+const db = require('../config/db');
 
-function attachUser(req, res, next) {
+// Middleware kiểm tra và phân quyền người dùng
+async function attachUser(req, res, next) {
+  if (req.session.user) {
+    try {
+      const [rows] = await db.query('SELECT coins FROM users WHERE id = ?', [req.session.user.id]);
+      if (rows.length > 0) {
+        req.session.user.coins = rows[0].coins || 0;
+      }
+    } catch (e) {
+      // Bỏ qua lỗi nhẹ nếu db tạm thời bận
+    }
+  }
+
   res.locals.currentUser = req.session.user || null;
   res.locals.currentPath = req.path;
   res.locals.success_msg = req.flash('success_msg');

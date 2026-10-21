@@ -12,7 +12,7 @@ const generalLimiter = rateLimit({
 // Rate limiter nghiêm ngặt cho đăng nhập, đăng ký phòng chống brute-force
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 phút
-  max: 30, // Tối đa 30 lần thử
+  max: 100, // Tối đa 100 lần thử trong 15 phút
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {

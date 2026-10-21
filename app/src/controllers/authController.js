@@ -15,7 +15,8 @@ exports.getLogin = (req, res) => {
 
 // Xử lý đăng nhập
 exports.postLogin = async (req, res) => {
-  const { account, password, redirect } = req.body;
+  const { password, redirect } = req.body;
+  const account = req.body.account || req.body.username;
 
   if (!account || !password) {
     req.flash('error_msg', 'Vui lòng điền đầy đủ tài khoản/email và mật khẩu!');

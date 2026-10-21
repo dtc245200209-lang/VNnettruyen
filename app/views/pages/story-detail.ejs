@@ -1,21 +1,23 @@
 <%- include('../partials/header') %>
 
-<div style="margin: 25px 0;">
-  <!-- Breadcrumb -->
-  <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
-    <a href="/">Trang chủ</a> &gt; <a href="/stories">Truyện</a> &gt; <span style="color: var(--text-primary);"><%= story.title %></span>
+<div style="margin: 20px 0;">
+  <!-- Breadcrumbs -->
+  <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+    <a href="/">Trang chủ</a> &gt; <a href="/stories">Thư viện</a> &gt; <strong style="color: var(--text-main);"><%= story.title %></strong>
   </div>
 
-  <!-- Story Main Info -->
-  <div class="story-detail-card">
+  <!-- Story Main Card -->
+  <div class="forum-card" style="display: grid; grid-template-columns: 220px 1fr; gap: 24px; align-items: flex-start;">
     <div>
-      <img src="<%= story.cover_image %>" alt="<%= story.title %>" class="story-detail-cover" onerror="this.src='/public/images/default-cover.png'">
+      <img src="<%= story.cover_image %>" alt="<%= story.title %>" style="width: 100%; aspect-ratio: 2/3; object-fit: cover; border-radius: var(--radius-sm); box-shadow: var(--shadow-md); border: 1px solid var(--border-color);" onerror="this.src='/public/images/cover-1.jpg'">
     </div>
 
-    <div class="story-detail-info">
-      <h1><%= story.title %></h1>
-      
-      <div class="story-detail-meta">
+    <div>
+      <h1 style="font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin-bottom: 10px; line-height: 1.3;">
+        <%= story.title %>
+      </h1>
+
+      <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.88rem; color: var(--text-main); margin-bottom: 16px;">
         <div>✍️ Tác giả: <strong><%= story.author_name %></strong></div>
         <div>
           🏷️ Thể loại: 
@@ -23,7 +25,7 @@
             <% const gNames = story.genre_names.split('||'); %>
             <% const gSlugs = story.genre_slugs.split('||'); %>
             <% gNames.forEach((name, i) => { %>
-              <a href="/stories?genre=<%= gSlugs[i] %>" class="genre-tag" style="margin-right: 4px;"><%= name %></a>
+              <a href="/stories?genre=<%= gSlugs[i] %>" class="tag-badge tag-badge-orange" style="margin-right: 4px;"><%= name %></a>
             <% }) %>
           <% } else { %>
             <span style="color: var(--text-muted);">Đang cập nhật</span>
@@ -31,8 +33,8 @@
         </div>
         <div>
           📌 Trạng thái: 
-          <span class="badge <%= story.status === 'completed' ? 'badge-completed' : 'badge-ongoing' %>">
-            <%= story.status === 'completed' ? 'Hoàn thành' : 'Đang ra' %>
+          <span style="font-weight: 700; color: <%= story.status === 'completed' ? '#16a34a' : '#ea580c' %>;">
+            <%= story.status === 'completed' ? 'Hoàn thành' : 'Đang tiến hành' %>
           </span>
         </div>
         <div>👁️ Lượt đọc: <strong><%= story.views %></strong></div>
@@ -40,16 +42,14 @@
       </div>
 
       <!-- Action Buttons -->
-      <div class="story-detail-actions">
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px;">
         <% if (chapters && chapters.length > 0) { %>
           <a href="/stories/<%= story.slug %>/chapters/<%= chapters[0].chapter_number %>" class="btn btn-primary">
             📖 Đọc từ đầu (Chương 1)
           </a>
           <a href="/stories/<%= story.slug %>/chapters/<%= chapters[chapters.length - 1].chapter_number %>" class="btn btn-secondary">
-            ⏩ Đọc mới nhất (Chương <%= chapters[chapters.length - 1].chapter_number %>)
+            ⏩ Chương mới nhất (<%= chapters[chapters.length - 1].chapter_number %>)
           </a>
-        <% } else { %>
-          <button class="btn btn-secondary" disabled>Chưa có chương nào</button>
         <% } %>
 
         <% if (currentUser) { %>
@@ -61,7 +61,7 @@
         <% } %>
 
         <% if (currentUser && (currentUser.id === story.author_id || currentUser.role === 'admin')) { %>
-          <a href="/author/stories/<%= story.id %>/chapters" class="btn btn-accent">
+          <a href="/author/stories/<%= story.id %>/chapters" class="btn btn-secondary" style="border-color: #f59e0b; color: var(--header-orange-dark);">
             ⚙️ Quản lý chương truyện
           </a>
         <% } %>
@@ -70,84 +70,85 @@
   </div>
 
   <!-- Synopsis -->
-  <div class="story-synopsis">
-    <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 12px; color: var(--accent-secondary);">
-      📝 Tóm Tắt Nội Dung
-    </h3>
-    <p style="font-size: 0.95rem; line-height: 1.8; color: var(--text-primary); white-space: pre-line;">
+  <div class="forum-card">
+    <div class="top-shelf-header" style="margin-bottom: 12px;">
+      <span>📝</span> Giới Thiệu & Tóm Tắt Tác Phẩm
+    </div>
+    <div style="font-size: 0.95rem; line-height: 1.8; color: var(--text-main); white-space: pre-line;">
       <%= story.description %>
-    </p>
+    </div>
   </div>
 
-  <!-- Chapters List -->
-  <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px; margin-bottom: 30px;">
-    <div class="section-header" style="margin-bottom: 16px;">
-      <h3 class="section-title">📑 Danh Sách Chương (<%= chapters ? chapters.length : 0 %>)</h3>
+  <!-- Chapters Grid -->
+  <div class="forum-card">
+    <div class="top-shelf-header" style="margin-bottom: 14px;">
+      <span>📑</span> Danh Sách Các Chương (<%= chapters ? chapters.length : 0 %>)
     </div>
 
     <% if (chapters && chapters.length > 0) { %>
-      <div class="chapter-list-grid">
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px;">
         <% chapters.forEach(chap => { %>
-          <a href="/stories/<%= story.slug %>/chapters/<%= chap.chapter_number %>" class="chapter-item">
+          <a href="/stories/<%= story.slug %>/chapters/<%= chap.chapter_number %>" style="display: flex; justify-content: space-between; padding: 10px 14px; background-color: var(--bg-card-header); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.88rem; color: var(--text-main);">
             <span>Chương <%= chap.chapter_number %>: <%= chap.title %></span>
             <span style="font-size: 0.75rem; color: var(--text-muted);"><%= new Date(chap.created_at).toLocaleDateString('vi-VN') %></span>
           </a>
         <% }) %>
       </div>
     <% } else { %>
-      <div style="padding: 24px; text-align: center; color: var(--text-muted);">
+      <div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.9rem;">
         Tác giả đang chuẩn bị nội dung và sẽ ra mắt chương mới sớm nhất.
       </div>
     <% } %>
   </div>
 
   <!-- Comments Section -->
-  <div class="comment-section">
-    <div class="section-header" style="margin-bottom: 20px;">
-      <h3 class="section-title">💬 Thảo Luận & Bình Luận (<%= comments ? comments.length : 0 %>)</h3>
+  <div class="forum-card">
+    <div class="top-shelf-header" style="margin-bottom: 16px;">
+      <span>💬</span> Thảo Luận Cộng Đồng (<%= comments ? comments.length : 0 %>)
     </div>
 
     <% if (currentUser) { %>
-      <form action="/comments" method="POST" class="comment-input-box">
+      <form action="/comments" method="POST" style="margin-bottom: 24px;">
         <input type="hidden" name="story_id" value="<%= story.id %>">
-        <textarea name="content" placeholder="Chia sẻ cảm nghĩ của bạn về tác phẩm này..." required maxlength="1000"></textarea>
+        <textarea name="content" class="form-control" rows="3" placeholder="Chia sẻ cảm nhận của bạn về tác phẩm này..." required maxlength="1000" style="margin-bottom: 10px;"></textarea>
         <div style="display: flex; justify-content: flex-end;">
           <button type="submit" class="btn btn-primary">Gửi bình luận</button>
         </div>
       </form>
     <% } else { %>
-      <div style="background-color: var(--bg-secondary); border: 1px dashed var(--border-color); padding: 16px; border-radius: var(--radius-md); text-align: center;">
-        Vui lòng <a href="/auth/login" style="color: var(--accent-secondary); font-weight: 600;">đăng nhập</a> để tham gia bình luận cùng cộng đồng.
+      <div style="padding: 16px; background-color: var(--bg-card-header); border: 1px dashed var(--border-color); border-radius: var(--radius-sm); text-align: center; margin-bottom: 20px; font-size: 0.9rem;">
+        Vui lòng <a href="/auth/login" style="color: var(--header-orange-dark); font-weight: 700;">đăng nhập</a> để tham gia thảo luận cùng bạn đọc.
       </div>
     <% } %>
 
-    <!-- Comment List -->
-    <div class="comment-list">
+    <div style="display: flex; flex-direction: column; gap: 12px;">
       <% if (comments && comments.length > 0) { %>
         <% comments.forEach(cmt => { %>
-          <div class="comment-card">
-            <div class="comment-header">
-              <div class="comment-author-info">
-                <img src="<%= cmt.avatar %>" alt="<%= cmt.username %>" class="user-avatar-sm" onerror="this.src='/public/images/default-avatar.png'">
+          <div style="display: flex; gap: 12px; padding: 12px; background-color: var(--bg-card-header); border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+            <img src="<%= cmt.avatar || '/public/images/logo.png' %>" alt="<%= cmt.username %>" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;" onerror="this.src='/public/images/logo.png'">
+            <div style="flex: 1;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
                 <div>
                   <strong><%= cmt.username %></strong>
-                  <span class="badge badge-<%= cmt.role %>" style="margin-left: 6px;"><%= cmt.role %></span>
+                  <span style="font-size: 0.72rem; padding: 1px 6px; border-radius: 3px; background-color: #64748b; color: #ffffff; margin-left: 6px;"><%= cmt.role %></span>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <span style="font-size: 0.75rem; color: var(--text-muted);"><%= new Date(cmt.created_at).toLocaleString('vi-VN') %></span>
+                  <% if (currentUser && (currentUser.id === cmt.user_id || currentUser.role === 'admin')) { %>
+                    <form action="/comments/<%= cmt.id %>/delete" method="POST" class="confirm-delete" data-confirm-message="Bạn có chắc chắn muốn xóa bình luận này?">
+                      <button type="submit" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.78rem;">Xóa</button>
+                    </form>
+                  <% } %>
                 </div>
               </div>
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <span class="comment-time"><%= new Date(cmt.created_at).toLocaleString('vi-VN') %></span>
-                <% if (currentUser && (currentUser.id === cmt.user_id || currentUser.role === 'admin')) { %>
-                  <form action="/comments/<%= cmt.id %>/delete" method="POST" class="confirm-delete" data-confirm-message="Bạn có chắc chắn muốn xóa bình luận này?">
-                    <button type="submit" style="background: none; border: none; color: var(--danger); cursor: pointer; font-size: 0.8rem;">🗑️ Xóa</button>
-                  </form>
-                <% } %>
+              <div style="font-size: 0.88rem; line-height: 1.5; color: var(--text-main);">
+                <%= cmt.content %>
               </div>
             </div>
-            <div class="comment-body"><%= cmt.content %></div>
           </div>
         <% }) %>
       <% } else { %>
-        <div style="text-align: center; color: var(--text-muted); padding: 20px;">
+        <div style="text-align: center; color: var(--text-muted); padding: 16px; font-size: 0.88rem;">
           Chưa có bình luận nào. Hãy là người đầu tiên để lại cảm nghĩ!
         </div>
       <% } %>

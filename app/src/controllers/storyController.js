@@ -2,7 +2,6 @@ const db = require('../config/db');
 const logger = require('../config/logger');
 const sanitizeHtml = require('sanitize-html');
 
-// Helper định dạng cấu hình XSS
 const sanitizeOptions = {
   allowedTags: ['b', 'i', 'em', 'strong', 'a', 'p', 'br'],
   allowedAttributes: {
@@ -10,43 +9,11 @@ const sanitizeOptions = {
   }
 };
 
-// 1. Trang chủ
+// 1. Trang chủ phong cách Diễn Đàn Sáng Tác & Đọc Truyện (Vnkings Style)
 exports.getHome = async (req, res) => {
   try {
-    // Truyện nổi bật
-    const [featuredStories] = await db.query(`
-      SELECT s.id, s.title, s.slug, s.cover_image, s.status, s.views, s.description,
-             u.username AS author_name,
-             (SELECT COUNT(*) FROM chapters WHERE story_id = s.id AND status = 'published') AS total_chapters,
-             GROUP_CONCAT(g.name SEPARATOR ', ') AS genres_list
-      FROM stories s
-      JOIN users u ON s.author_id = u.id
-      LEFT JOIN story_genres sg ON s.id = sg.story_id
-      LEFT JOIN genres g ON sg.genre_id = g.id
-      WHERE s.is_featured = 1
-      GROUP BY s.id
-      LIMIT 6
-    `);
-
-    // Truyện mới cập nhật
-    const [latestStories] = await db.query(`
-      SELECT s.id, s.title, s.slug, s.cover_image, s.status, s.views, s.updated_at,
-             u.username AS author_name,
-             (SELECT COUNT(*) FROM chapters WHERE story_id = s.id AND status = 'published') AS total_chapters,
-             (SELECT title FROM chapters WHERE story_id = s.id AND status = 'published' ORDER BY chapter_number DESC LIMIT 1) AS latest_chapter_title,
-             (SELECT chapter_number FROM chapters WHERE story_id = s.id AND status = 'published' ORDER BY chapter_number DESC LIMIT 1) AS latest_chapter_number,
-             GROUP_CONCAT(g.name SEPARATOR ', ') AS genres_list
-      FROM stories s
-      JOIN users u ON s.author_id = u.id
-      LEFT JOIN story_genres sg ON s.id = sg.story_id
-      LEFT JOIN genres g ON sg.genre_id = g.id
-      GROUP BY s.id
-      ORDER BY s.updated_at DESC
-      LIMIT 12
-    `);
-
-    // Bảng xếp hạng đọc nhiều (Top Views)
-    const [topStories] = await db.query(`
+    // 1. Top View Tuần (Dải sách ngang trên cùng)
+    const [topWeeklyStories] = await db.query(`
       SELECT s.id, s.title, s.slug, s.cover_image, s.views, u.username AS author_name,
              (SELECT COUNT(*) FROM chapters WHERE story_id = s.id AND status = 'published') AS total_chapters
       FROM stories s
@@ -55,14 +22,90 @@ exports.getHome = async (req, res) => {
       LIMIT 10
     `);
 
-    // Tất cả thể loại
+    // 2. Tác phẩm tiêu biểu (Spotlight Banner)
+    const [spotlightRows] = await db.query(`
+      SELECT s.id, s.title, s.slug, s.cover_image, s.description, s.views,
+             u.username AS author_name,
+             (SELECT name FROM genres g JOIN story_genres sg ON g.id = sg.genre_id WHERE sg.story_id = s.id LIMIT 1) AS primary_genre
+      FROM stories s
+      JOIN users u ON s.author_id = u.id
+      WHERE s.is_featured = 1
+      ORDER BY s.views DESC
+      LIMIT 1
+    `);
+    const spotlightStory = spotlightRows.length > 0 ? spotlightRows[0] : topWeeklyStories[0];
+
+    // 3. Thông báo diễn đàn (Bulletin Board)
+    const [announcements] = await db.query('SELECT * FROM forum_announcements ORDER BY display_order ASC');
+
+    // 4. Chương mới cập nhật (Cột bên phải của 2-column updates)
+    const [latestChapters] = await db.query(`
+      SELECT c.id, c.chapter_number, c.title AS chapter_title, c.updated_at,
+             s.title AS story_title, s.slug AS story_slug,
+             u.username AS author_name,
+             (SELECT name FROM genres g JOIN story_genres sg ON g.id = sg.genre_id WHERE sg.story_id = s.id LIMIT 1) AS genre_name
+      FROM chapters c
+      JOIN stories s ON c.story_id = s.id
+      JOIN users u ON s.author_id = u.id
+      WHERE c.status = 'published'
+      ORDER BY c.updated_at DESC
+      LIMIT 8
+    `);
+
+    // 5. Hoạt động mới / Bình luận thảo luận (Cột bên trái của 2-column updates)
+    const [recentComments] = await db.query(`
+      SELECT c.id, c.content, c.created_at,
+             u.username, u.avatar,
+             s.title AS story_title, s.slug AS story_slug,
+             (SELECT name FROM genres g JOIN story_genres sg ON g.id = sg.genre_id WHERE sg.story_id = s.id LIMIT 1) AS genre_name
+      FROM comments c
+      JOIN users u ON c.user_id = u.id
+      JOIN stories s ON c.story_id = s.id
+      ORDER BY c.created_at DESC
+      LIMIT 8
+    `);
+
+    // 6. Dòng tin Điểm Danh thành viên (Check-in Ticker)
+    const [checkinFeed] = await db.query(`
+      SELECT d.coins_earned, d.created_at, u.username
+      FROM daily_checkins d
+      JOIN users u ON d.user_id = u.id
+      ORDER BY d.created_at DESC
+      LIMIT 6
+    `);
+
+    // 7. Hoạt động chung cộng đồng (Sidebar Community Stream)
+    const [communityActivities] = await db.query(`
+      SELECT 'comment' AS type, u.username, u.avatar, s.title AS story_title, s.slug AS story_slug, c.created_at
+      FROM comments c
+      JOIN users u ON c.user_id = u.id
+      JOIN stories s ON c.story_id = s.id
+      ORDER BY c.created_at DESC
+      LIMIT 6
+    `);
+
+    // 8. Tất cả thể loại phục vụ Mega-Menu & Subnav
     const [genres] = await db.query('SELECT * FROM genres ORDER BY name ASC');
 
+    // 9. Bảng xếp hạng (Rankings sidebar)
+    const [rankingStories] = await db.query(`
+      SELECT s.id, s.title, s.slug, s.cover_image, s.views, u.username AS author_name
+      FROM stories s
+      JOIN users u ON s.author_id = u.id
+      ORDER BY s.views DESC
+      LIMIT 10
+    `);
+
     res.render('pages/index', {
-      title: 'VNnettruyen - Website Đọc và Sáng Tác Truyện Hàng Đầu Việt Nam',
-      featuredStories,
-      latestStories,
-      topStories,
+      title: 'VNnettruyen - Diễn Đàn Đọc và Sáng Tác Truyện Việt Nam',
+      topWeeklyStories,
+      spotlightStory,
+      announcements,
+      latestChapters,
+      recentComments,
+      checkinFeed,
+      communityActivities,
+      rankingStories,
       genres
     });
   } catch (err) {
@@ -70,12 +113,12 @@ exports.getHome = async (req, res) => {
     res.status(500).render('pages/error', {
       title: 'Lỗi máy chủ',
       statusCode: 500,
-      message: 'Không thể kết nối đến dữ liệu trang chủ.'
+      message: 'Không thể kết nối đến cơ sở dữ liệu diễn đàn.'
     });
   }
 };
 
-// 2. Danh sách truyện (Tìm kiếm, lọc thể loại, trạng thái, phân trang)
+// 2. Danh sách truyện (Khám phá truyện, tìm kiếm, lọc, phân trang)
 exports.getStories = async (req, res) => {
   try {
     const page = parseInt(req.query.page || '1', 10);
@@ -87,19 +130,16 @@ exports.getStories = async (req, res) => {
     let whereConditions = ['1=1'];
     let queryParams = [];
 
-    // Tìm kiếm từ khóa
     if (q && q.trim() !== '') {
       whereConditions.push('(s.title LIKE ? OR u.username LIKE ?)');
       queryParams.push(`%${q.trim()}%`, `%${q.trim()}%`);
     }
 
-    // Lọc theo trạng thái
     if (status && (status === 'ongoing' || status === 'completed')) {
       whereConditions.push('s.status = ?');
       queryParams.push(status);
     }
 
-    // Lọc theo thể loại slug
     let genreJoin = '';
     if (genre && genre.trim() !== '') {
       genreJoin = 'JOIN story_genres sg_filter ON s.id = sg_filter.story_id JOIN genres g_filter ON sg_filter.genre_id = g_filter.id';
@@ -107,7 +147,6 @@ exports.getStories = async (req, res) => {
       queryParams.push(genre.trim());
     }
 
-    // Sắp xếp
     let orderBy = 's.updated_at DESC';
     if (sort === 'views') orderBy = 's.views DESC';
     if (sort === 'title') orderBy = 's.title ASC';
@@ -115,7 +154,6 @@ exports.getStories = async (req, res) => {
 
     const whereClause = whereConditions.join(' AND ');
 
-    // Đếm tổng số
     const countSql = `
       SELECT COUNT(DISTINCT s.id) AS total
       FROM stories s
@@ -127,11 +165,12 @@ exports.getStories = async (req, res) => {
     const totalStories = countRows[0].total;
     const totalPages = Math.ceil(totalStories / limit) || 1;
 
-    // Lấy dữ liệu truyện
     const storiesSql = `
       SELECT s.id, s.title, s.slug, s.cover_image, s.status, s.views, s.updated_at,
              u.username AS author_name,
              (SELECT COUNT(*) FROM chapters WHERE story_id = s.id AND status = 'published') AS total_chapters,
+             (SELECT title FROM chapters WHERE story_id = s.id AND status = 'published' ORDER BY chapter_number DESC LIMIT 1) AS latest_chapter_title,
+             (SELECT chapter_number FROM chapters WHERE story_id = s.id AND status = 'published' ORDER BY chapter_number DESC LIMIT 1) AS latest_chapter_number,
              GROUP_CONCAT(DISTINCT g.name SEPARATOR ', ') AS genres_list
       FROM stories s
       JOIN users u ON s.author_id = u.id
@@ -148,7 +187,7 @@ exports.getStories = async (req, res) => {
     const [genres] = await db.query('SELECT * FROM genres ORDER BY name ASC');
 
     res.render('pages/stories', {
-      title: 'Danh sách truyện - VNnettruyen',
+      title: 'Khám Phá & Đọc Truyện - VNnettruyen',
       stories,
       genres,
       currentPage: page,
@@ -197,7 +236,7 @@ exports.getStoryDetail = async (req, res) => {
     // Tăng lượt xem
     await db.query('UPDATE stories SET views = views + 1 WHERE id = ?', [story.id]);
 
-    // Lấy danh sách chương
+    // Danh sách chương
     const [chapters] = await db.query(`
       SELECT id, chapter_number, title, created_at
       FROM chapters
@@ -205,7 +244,7 @@ exports.getStoryDetail = async (req, res) => {
       ORDER BY chapter_number ASC
     `, [story.id]);
 
-    // Lấy bình luận của truyện
+    // Bình luận
     const [comments] = await db.query(`
       SELECT c.*, u.username, u.avatar, u.role
       FROM comments c
@@ -215,7 +254,7 @@ exports.getStoryDetail = async (req, res) => {
       LIMIT 30
     `, [story.id]);
 
-    // Kiểm tra xem người dùng hiện tại đã bookmark chưa
+    // Kiểm tra bookmark
     let isBookmarked = false;
     if (req.session.user) {
       const [fav] = await db.query(
@@ -225,12 +264,15 @@ exports.getStoryDetail = async (req, res) => {
       isBookmarked = fav.length > 0;
     }
 
+    const [genres] = await db.query('SELECT * FROM genres ORDER BY name ASC');
+
     res.render('pages/story-detail', {
       title: `${story.title} - Đọc Truyện Online tại VNnettruyen`,
       story,
       chapters,
       comments,
-      isBookmarked
+      isBookmarked,
+      genres
     });
   } catch (err) {
     logger.error('Lỗi khi tải chi tiết truyện:', err);
@@ -248,7 +290,6 @@ exports.getChapter = async (req, res) => {
   const num = parseInt(chapterNumber, 10);
 
   try {
-    // Tìm truyện
     const [stories] = await db.query('SELECT id, title, slug FROM stories WHERE slug = ? LIMIT 1', [slug]);
     if (stories.length === 0) {
       return res.status(404).render('pages/error', {
@@ -259,7 +300,6 @@ exports.getChapter = async (req, res) => {
     }
     const story = stories[0];
 
-    // Tìm chương hiện tại
     const [chapters] = await db.query(`
       SELECT * FROM chapters 
       WHERE story_id = ? AND chapter_number = ? AND status = 'published'
@@ -276,7 +316,6 @@ exports.getChapter = async (req, res) => {
 
     const currentChapter = chapters[0];
 
-    // Lấy danh sách tất cả các chương để phục vụ Menu Chọn Nhanh
     const [allChapters] = await db.query(`
       SELECT id, chapter_number, title 
       FROM chapters 
@@ -284,11 +323,9 @@ exports.getChapter = async (req, res) => {
       ORDER BY chapter_number ASC
     `, [story.id]);
 
-    // Tìm chương trước và chương kế tiếp
     const prevChapter = allChapters.find(c => c.chapter_number === num - 1) || null;
     const nextChapter = allChapters.find(c => c.chapter_number === num + 1) || null;
 
-    // Lưu lịch sử đọc nếu đăng nhập
     if (req.session.user) {
       await db.query(`
         INSERT INTO reading_history (user_id, story_id, chapter_id, read_at)
@@ -297,7 +334,6 @@ exports.getChapter = async (req, res) => {
       `, [req.session.user.id, story.id, currentChapter.id]);
     }
 
-    // Lấy bình luận riêng của chương này
     const [chapterComments] = await db.query(`
       SELECT c.*, u.username, u.avatar, u.role
       FROM comments c
@@ -306,6 +342,8 @@ exports.getChapter = async (req, res) => {
       ORDER BY c.created_at DESC
     `, [currentChapter.id]);
 
+    const [genres] = await db.query('SELECT * FROM genres ORDER BY name ASC');
+
     res.render('pages/chapter-reader', {
       title: `${story.title} - ${currentChapter.title} | VNnettruyen`,
       story,
@@ -313,7 +351,8 @@ exports.getChapter = async (req, res) => {
       allChapters,
       prevChapter,
       nextChapter,
-      comments: chapterComments
+      comments: chapterComments,
+      genres
     });
   } catch (err) {
     logger.error('Lỗi khi tải chương truyện:', err);
@@ -325,7 +364,7 @@ exports.getChapter = async (req, res) => {
   }
 };
 
-// 5. Gửi bình luận (Hỗ trợ chống XSS)
+// 5. Gửi bình luận
 exports.postComment = async (req, res) => {
   const { story_id, chapter_id, content } = req.body;
   const userId = req.session.user.id;
@@ -340,7 +379,6 @@ exports.postComment = async (req, res) => {
     return res.redirect('back');
   }
 
-  // Khử trùng XSS an toàn
   const cleanContent = sanitizeHtml(content.trim(), sanitizeOptions);
 
   try {
@@ -353,12 +391,12 @@ exports.postComment = async (req, res) => {
     res.redirect('back');
   } catch (err) {
     logger.error('Lỗi khi lưu bình luận:', err);
-    req.flash('error_msg', 'Không thể lưu bình luận, vui lòng thử lại sau!');
+    req.flash('error_msg', 'Không thể lưu bình luận!');
     res.redirect('back');
   }
 };
 
-// 6. Xóa bình luận (chỉ tác giả bình luận hoặc admin)
+// 6. Xóa bình luận
 exports.deleteComment = async (req, res) => {
   const { commentId } = req.params;
   const user = req.session.user;
@@ -385,7 +423,7 @@ exports.deleteComment = async (req, res) => {
   }
 };
 
-// 7. Thêm/Hủy yêu thích truyện (Tủ sách)
+// 7. Thêm/Hủy yêu thích truyện
 exports.toggleBookmark = async (req, res) => {
   const { storyId } = req.body;
   const userId = req.session.user.id;
@@ -405,7 +443,6 @@ exports.toggleBookmark = async (req, res) => {
       bookmarked = true;
     }
 
-    // Nếu là AJAX request
     if (req.xhr || req.headers.accept.indexOf('json') > -1) {
       return res.json({ success: true, bookmarked });
     }
@@ -419,5 +456,44 @@ exports.toggleBookmark = async (req, res) => {
     }
     req.flash('error_msg', 'Lỗi thao tác tủ sách!');
     res.redirect('back');
+  }
+};
+
+// 8. Điểm danh nhận Xu hằng ngày (Daily Check-in API)
+exports.postDailyCheckin = async (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).json({ success: false, message: 'Vui lòng đăng nhập để điểm danh!' });
+  }
+
+  const userId = req.session.user.id;
+
+  try {
+    const [todayCheckin] = await db.query(
+      'SELECT id FROM daily_checkins WHERE user_id = ? AND DATE(created_at) = CURDATE() LIMIT 1',
+      [userId]
+    );
+
+    if (todayCheckin.length > 0) {
+      return res.json({ success: false, message: 'Bạn đã điểm danh hôm nay rồi! Hãy quay lại vào ngày mai nhé.' });
+    }
+
+    // Tặng ngẫu nhiên từ 3 đến 10 Xu
+    const earnedCoins = Math.floor(Math.random() * 8) + 3;
+
+    await db.query('INSERT INTO daily_checkins (user_id, coins_earned) VALUES (?, ?)', [userId, earnedCoins]);
+    await db.query('UPDATE users SET coins = COALESCE(coins, 0) + ? WHERE id = ?', [earnedCoins, userId]);
+
+    const [[updatedUser]] = await db.query('SELECT coins FROM users WHERE id = ?', [userId]);
+
+    logger.info(`Người dùng ${req.session.user.username} điểm danh nhận ${earnedCoins} Xu`);
+    return res.json({
+      success: true,
+      earnedCoins,
+      totalCoins: updatedUser.coins,
+      message: `Điểm danh thành công! Bạn nhận được ${earnedCoins} Xu từ hệ thống VNnettruyen.`
+    });
+  } catch (err) {
+    logger.error('Lỗi điểm danh:', err);
+    return res.status(500).json({ success: false, message: 'Lỗi máy chủ khi điểm danh.' });
   }
 };

@@ -1,6 +1,6 @@
 -- ===================================================
 -- VNnettruyen Database Initialization Script
--- Hệ thống cơ sở dữ liệu cho Website Đọc & Viết Truyện
+-- Hệ thống cơ sở dữ liệu cho Diễn Đàn Đọc & Viết Truyện
 -- ===================================================
 
 CREATE DATABASE IF NOT EXISTS `vnnettruyen_db` 
@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `email` VARCHAR(100) NOT NULL UNIQUE,
   `password` VARCHAR(255) NOT NULL,
   `role` ENUM('reader', 'author', 'admin') NOT NULL DEFAULT 'reader',
+  `coins` INT DEFAULT 50,
   `bio` TEXT NULL,
   `avatar` VARCHAR(255) DEFAULT '/public/images/default-avatar.png',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -115,19 +116,25 @@ CREATE TABLE IF NOT EXISTS `reading_history` (
   FOREIGN KEY (`chapter_id`) REFERENCES `chapters`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 9. Bảng báo cáo nội dung (reports)
-CREATE TABLE IF NOT EXISTS `reports` (
+-- 9. Bảng điểm danh hằng ngày (daily_checkins)
+CREATE TABLE IF NOT EXISTS `daily_checkins` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `reporter_id` INT NOT NULL,
-  `target_type` ENUM('story', 'chapter', 'comment') NOT NULL,
-  `target_id` INT NOT NULL,
-  `reason` VARCHAR(255) NOT NULL,
-  `status` ENUM('pending', 'resolved', 'dismissed') NOT NULL DEFAULT 'pending',
+  `user_id` INT NOT NULL,
+  `coins_earned` INT DEFAULT 5,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (`reporter_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 10. Bảng lưu trữ Session cho Express (sessions)
+-- 10. Bảng thông báo diễn đàn (forum_announcements)
+CREATE TABLE IF NOT EXISTS `forum_announcements` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `title` VARCHAR(255) NOT NULL,
+  `url` VARCHAR(255) NOT NULL,
+  `color` VARCHAR(20) DEFAULT '#e74c3c',
+  `display_order` INT DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 11. Bảng lưu trữ Session cho Express (sessions)
 CREATE TABLE IF NOT EXISTS `sessions` (
   `session_id` VARCHAR(128) COLLATE utf8mb4_bin NOT NULL PRIMARY KEY,
   `expires` INT(11) UNSIGNED NOT NULL,
@@ -144,10 +151,10 @@ CREATE TABLE IF NOT EXISTS `sessions` (
 -- docgia_vn: Reader@123456
 -- ===================================================
 
-INSERT INTO `users` (`id`, `username`, `email`, `password`, `role`, `bio`) VALUES
-(1, 'admin', 'admin@vnnettruyen.vn', '$2a$10$Nf6M/sI/CvRT6CMOpN0V1O.5qjg6MNu2eFz8kyHuyBw1OZW2tmw7S', 'admin', 'Quản trị viên diễn đàn VNnettruyen'),
-(2, 'tacgia_viet', 'author@vnnettruyen.vn', '$2a$10$TsecfGtT9maTbSZN6wxnUO0LFYx0Fm3bPAALcylPssgdnqdKy5ow2', 'author', 'Tác giả sáng tác dã sử, kiếm hiệp và huyền huyễn Việt Nam'),
-(3, 'docgia_vn', 'reader@vnnettruyen.vn', '$2a$10$OtEWI1Pj1wge5/A0AQo.qOGPK1.7fsvRtFresEFd71HZlcm21YLX.', 'reader', 'Độc giả đam mê văn học mạng và tiểu thuyết kỳ ảo');
+INSERT INTO `users` (`id`, `username`, `email`, `password`, `role`, `coins`, `bio`) VALUES
+(1, 'admin', 'admin@vnnettruyen.vn', '$2a$10$Nf6M/sI/CvRT6CMOpN0V1O.5qjg6MNu2eFz8kyHuyBw1OZW2tmw7S', 'admin', 500, 'Quản trị viên diễn đàn VNnettruyen'),
+(2, 'tacgia_viet', 'author@vnnettruyen.vn', '$2a$10$TsecfGtT9maTbSZN6wxnUO0LFYx0Fm3bPAALcylPssgdnqdKy5ow2', 'author', 250, 'Tác giả sáng tác dã sử, kiếm hiệp và huyền huyễn Việt Nam'),
+(3, 'docgia_vn', 'reader@vnnettruyen.vn', '$2a$10$OtEWI1Pj1wge5/A0AQo.qOGPK1.7fsvRtFresEFd71HZlcm21YLX.', 'reader', 120, 'Độc giả đam mê văn học mạng và tiểu thuyết kỳ ảo');
 
 INSERT INTO `genres` (`id`, `name`, `slug`, `description`) VALUES
 (1, 'Tiên Hiệp', 'tien-hiep', 'Truyện tu tiên luyện khí, vượt qua giới hạn phàm nhân phi thăng tiên giới'),
@@ -162,7 +169,7 @@ INSERT INTO `stories` (`id`, `title`, `slug`, `author_id`, `description`, `cover
 (1, 'Huyền Khí Đại Việt', 'huyen-khi-dai-viet', 2, 'Tại dải đất phương Nam ngàn năm văn hiến, linh khí đất trời thức tỉnh sau ngàn năm phong ấn dưới lòng sông Hồng. Chàng thiếu niên Trần Phong xuất thân thảo dân, kế thừa linh kiếm Thần Lôi, từng bước khám phá những bí ẩn cổ xưa về nguồn gốc sức mạnh dân tộc...', '/public/images/cover-1.jpg', 'ongoing', 1250, 1),
 (2, 'Thăng Long Kiếm Ảo', 'thang-long-kiem-ao', 2, 'Kinh thành Thăng Long sầm uất ẩn giấu những môn phái cổ xưa bảo vệ bờ cõi. Một cuộc kỳ ngộ giữa thiếu niên mồ côi và lão kiếm khách ẩn danh đã mở ra trang sử giang hồ đầy kịch tính.', '/public/images/cover-2.jpg', 'ongoing', 890, 1),
 (3, 'Bạch Hạc Dạ Hành', 'bach-hac-da-hanh', 2, 'Đất Phong Châu ngút ngàn rừng thiêng nước độc, những vụ mất tích kỳ quái của các đoàn thương buôn đưa bộ đôi hình bộ phán quan vào vòng xoáy ma thuật cổ xưa.', '/public/images/cover-3.jpg', 'completed', 2140, 1),
-(4, 'Đô Thị Tiên Phong 2026', 'do-thi-tien-phong-2026', 1, 'Sau khi du học trở về, kỹ sư trẻ Hoàng Nam phát hiện khả năng nhìn thấy các dòng chảy năng lượng trong dữ liệu máy tính, biến anh thành bậc thầy công nghệ siêu phàm.', '/public/images/default-cover.png', 'ongoing', 450, 0);
+(4, 'Đô Thị Tiên Phong 2026', 'do-thi-tien-phong-2026', 1, 'Sau khi du học trở về, kỹ sư trẻ Hoàng Nam phát hiện khả năng nhìn thấy các dòng chảy năng lượng trong dữ liệu máy tính, biến anh thành bậc thầy công nghệ siêu phàm.', '/public/images/cover-1.jpg', 'ongoing', 450, 0);
 
 INSERT INTO `story_genres` (`story_id`, `genre_id`) VALUES
 (1, 1), (1, 3), (1, 4),
@@ -210,3 +217,16 @@ INSERT INTO `favorites` (`user_id`, `story_id`) VALUES
 
 INSERT INTO `reading_history` (`user_id`, `story_id`, `chapter_id`) VALUES
 (3, 1, 1);
+
+INSERT INTO `daily_checkins` (`id`, `user_id`, `coins_earned`, `created_at`) VALUES
+(1, 3, 5, NOW() - INTERVAL 10 MINUTE),
+(2, 2, 9, NOW() - INTERVAL 25 MINUTE),
+(3, 1, 10, NOW() - INTERVAL 1 HOUR);
+
+INSERT INTO `forum_announcements` (`id`, `title`, `url`, `color`, `display_order`) VALUES
+(1, 'Kiếm tiền online: Viết truyện và chia sẻ nhuận bút tại VNnettruyen', '/stories', '#e74c3c', 1),
+(2, 'Nội Quy Cộng Đồng Diễn Đàn VNnettruyen.vn', '/stories', '#e67e22', 2),
+(3, 'Phản Hồi - Hỏi Đáp - Góp Ý Cùng Ban Quản Trị', '/stories', '#27ae60', 3),
+(4, 'Hướng Dẫn Thành Viên Đăng Truyện Lên Website', '/author/stories/create', '#8e44ad', 4),
+(5, 'Hướng Dẫn Đăng Các Chương, Các Phần Cho Tác Phẩm Mới', '/author', '#2980b9', 5),
+(6, 'Những lưu ý và lý do khiến truyện của bạn chưa được duyệt', '/stories', '#d35400', 6);

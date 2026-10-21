@@ -25,3 +25,5 @@ loki_data/
 # OS files
 .DS_Store
 Thumbs.db
+cookies*.txt
+test*.html

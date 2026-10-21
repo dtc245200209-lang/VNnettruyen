@@ -1,57 +1,56 @@
 <%- include('../partials/header') %>
 
-<div style="margin: 30px 0;">
-  <!-- User Profile Header Card -->
-  <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 28px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 30px;">
-    <div style="display: flex; align-items: center; gap: 20px;">
-      <img src="<%= profileUser.avatar %>" alt="<%= profileUser.username %>" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-secondary);" onerror="this.src='/public/images/default-avatar.png'">
+<div style="margin: 20px 0;">
+  <!-- User Profile Header -->
+  <div class="forum-card" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px;">
+    <div style="display: flex; align-items: center; gap: 18px;">
+      <img src="<%= profileUser.avatar || '/public/images/logo.png' %>" alt="<%= profileUser.username %>" style="width: 76px; height: 76px; border-radius: 50%; object-fit: cover; border: 3px solid var(--header-orange-top);" onerror="this.src='/public/images/logo.png'">
       <div>
-        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-          <h2 style="font-size: 1.5rem; font-weight: 800;"><%= profileUser.username %></h2>
-          <span class="badge badge-<%= profileUser.role %>"><%= profileUser.role %></span>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+          <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-main);"><%= profileUser.username %></h2>
+          <span style="font-size: 0.75rem; padding: 2px 8px; border-radius: 9999px; background-color: var(--header-orange-top); color: #ffffff; font-weight: 700;"><%= profileUser.role %></span>
+          <span class="user-badge-coins">💰 <%= profileUser.coins || 50 %> Xu</span>
         </div>
-        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 4px;">📧 <%= profileUser.email %></p>
-        <p style="color: var(--text-muted); font-size: 0.8rem;">Tham gia từ: <%= new Date(profileUser.created_at).toLocaleDateString('vi-VN') %></p>
+        <div style="font-size: 0.85rem; color: var(--text-muted);">📧 <%= profileUser.email %></div>
+        <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">Tham gia từ: <%= new Date(profileUser.created_at).toLocaleDateString('vi-VN') %></div>
       </div>
     </div>
 
-    <div>
+    <div style="display: flex; gap: 8px;">
       <% if (profileUser.role === 'author' || profileUser.role === 'admin') { %>
-        <a href="/author" class="btn btn-primary">✍️ Vào Studio Tác Giả</a>
+        <a href="/author" class="btn btn-primary">✍️ Studio Tác Giả</a>
       <% } %>
       <% if (profileUser.role === 'admin') { %>
-        <a href="/admin" class="btn btn-secondary">🛡️ Trang Quản Trị</a>
+        <a href="/admin" class="btn btn-secondary">🛡️ Quản Trị Hệ Thống</a>
       <% } %>
     </div>
   </div>
 
-  <div class="main-layout">
-    <!-- Left Column: Bookshelf & History -->
+  <div class="forum-main-layout">
+    <!-- Cột trái: Tủ sách & Lịch sử -->
     <div>
-      <!-- 1. Tủ sách cá nhân (Favorites) -->
-      <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; margin-bottom: 24px;">
-        <div class="section-header" style="margin-bottom: 16px;">
-          <h3 class="section-title">❤️ Tủ Sách Yêu Thích (<%= favorites ? favorites.length : 0 %>)</h3>
+      <!-- Tủ Sách Yêu Thích -->
+      <div class="forum-card">
+        <div class="top-shelf-header" style="margin-bottom: 14px;">
+          <span>❤️</span> Tủ Sách Yêu Thích (<%= favorites ? favorites.length : 0 %>)
         </div>
 
         <% if (favorites && favorites.length > 0) { %>
-          <div class="story-grid" style="grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));">
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px;">
             <% favorites.forEach(story => { %>
-              <div class="story-card">
-                <div class="story-cover-wrap">
-                  <a href="/stories/<%= story.slug %>">
-                    <img src="<%= story.cover_image %>" alt="<%= story.title %>" class="story-cover" onerror="this.src='/public/images/default-cover.png'">
+              <div style="border: 1px solid var(--border-color); border-radius: var(--radius-sm); overflow: hidden; background-color: var(--bg-card); display: flex; flex-direction: column;">
+                <a href="/stories/<%= story.slug %>">
+                  <img src="<%= story.cover_image %>" alt="<%= story.title %>" style="width: 100%; aspect-ratio: 2/3; object-fit: cover;" onerror="this.src='/public/images/cover-1.jpg'">
+                </a>
+                <div style="padding: 8px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                  <a href="/stories/<%= story.slug %>" style="font-weight: 700; font-size: 0.82rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                    <%= story.title %>
                   </a>
-                </div>
-                <div class="story-info">
-                  <a href="/stories/<%= story.slug %>">
-                    <h4 class="story-title" style="font-size: 0.85rem;"><%= story.title %></h4>
-                  </a>
-                  <div class="story-meta">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 0.72rem;">
                     <span>📖 <%= story.total_chapters %> ch</span>
                     <form action="/bookmark/toggle" method="POST" style="display: inline;">
                       <input type="hidden" name="storyId" value="<%= story.id %>">
-                      <button type="submit" style="background: none; border: none; color: var(--danger); cursor: pointer; font-size: 0.8rem;">Xóa</button>
+                      <button type="submit" style="background: none; border: none; color: #ef4444; cursor: pointer;">Xóa</button>
                     </form>
                   </div>
                 </div>
@@ -59,16 +58,16 @@
             <% }) %>
           </div>
         <% } else { %>
-          <div style="padding: 30px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
-            Tủ sách của bạn đang trống. Hãy bấm "Thêm vào tủ sách" ở truyện bạn yêu thích nhé!
+          <div style="text-align: center; color: var(--text-muted); padding: 24px; font-size: 0.88rem;">
+            Tủ sách của bạn chưa có tác phẩm nào. Bấm "Thêm vào tủ sách" ở truyện bạn yêu thích nhé!
           </div>
         <% } %>
       </div>
 
-      <!-- 2. Lịch sử đọc gần đây -->
-      <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
-        <div class="section-header" style="margin-bottom: 16px;">
-          <h3 class="section-title">🕒 Lịch Sử Đọc Gần Đây</h3>
+      <!-- Lịch Sử Đọc -->
+      <div class="forum-card">
+        <div class="top-shelf-header" style="margin-bottom: 14px;">
+          <span>🕒</span> Lịch Sử Đọc Gần Đây
         </div>
 
         <% if (history && history.length > 0) { %>
@@ -79,7 +78,7 @@
                   <th>Tác phẩm</th>
                   <th>Chương đã đọc</th>
                   <th>Thời gian</th>
-                  <th>Thao tác</th>
+                  <th>Đọc tiếp</th>
                 </tr>
               </thead>
               <tbody>
@@ -87,9 +86,9 @@
                   <tr>
                     <td><strong><%= item.story_title %></strong></td>
                     <td>Chương <%= item.chapter_number %>: <%= item.chapter_title %></td>
-                    <td style="color: var(--text-muted); font-size: 0.8rem;"><%= new Date(item.read_at).toLocaleString('vi-VN') %></td>
+                    <td style="font-size: 0.78rem; color: var(--text-muted);"><%= new Date(item.read_at).toLocaleString('vi-VN') %></td>
                     <td>
-                      <a href="/stories/<%= item.story_slug %>/chapters/<%= item.chapter_number %>" class="btn btn-secondary btn-sm">Đọc tiếp</a>
+                      <a href="/stories/<%= item.story_slug %>/chapters/<%= item.chapter_number %>" class="btn btn-secondary btn-sm">Tiếp tục</a>
                     </td>
                   </tr>
                 <% }) %>
@@ -97,22 +96,22 @@
             </table>
           </div>
         <% } else { %>
-          <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
-            Chưa ghi nhận lịch sử đọc.
+          <div style="text-align: center; color: var(--text-muted); padding: 20px; font-size: 0.88rem;">
+            Chưa có lịch sử đọc truyện.
           </div>
         <% } %>
       </div>
     </div>
 
-    <!-- Right Column: Settings & Password -->
+    <!-- Cột phải: Cập nhật hồ sơ & Mật khẩu -->
     <div>
-      <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
-        <h3 class="widget-title">⚙️ Cập Nhật Hồ Sơ</h3>
-        
+      <div class="sidebar-card">
+        <div class="sidebar-title">⚙️ Cập nhật thông tin</div>
+
         <form action="/profile" method="POST">
           <div class="form-group">
-            <label class="form-label">Tiểu sử (Bio)</label>
-            <textarea name="bio" class="form-control" rows="3" placeholder="Giới thiệu đôi nét về bản thân..."><%= profileUser.bio || '' %></textarea>
+            <label class="form-label">Tiểu sử cá nhân (Bio)</label>
+            <textarea name="bio" class="form-control" rows="3" placeholder="Đôi nét về bạn..."><%= profileUser.bio || '' %></textarea>
           </div>
 
           <div class="form-group">
@@ -120,17 +119,17 @@
             <input type="text" name="avatar" class="form-control" value="<%= profileUser.avatar %>">
           </div>
 
-          <hr style="border-color: var(--border-color); margin: 20px 0;">
-          <h4 style="font-size: 0.95rem; margin-bottom: 12px; color: var(--accent-secondary);">Đổi Mật Khẩu (Để trống nếu không đổi)</h4>
+          <hr style="border-color: var(--border-color); margin: 16px 0;">
+          <div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px; color: var(--header-orange-dark);">Đổi Mật Khẩu</div>
 
           <div class="form-group">
             <label class="form-label">Mật khẩu hiện tại</label>
-            <input type="password" name="currentPassword" class="form-control" placeholder="Nhập mật khẩu cũ...">
+            <input type="password" name="currentPassword" class="form-control" placeholder="Mật khẩu cũ...">
           </div>
 
           <div class="form-group">
             <label class="form-label">Mật khẩu mới</label>
-            <input type="password" name="newPassword" class="form-control" placeholder="Mật khẩu mới (tối thiểu 6 ký tự)...">
+            <input type="password" name="newPassword" class="form-control" placeholder="Tối thiểu 6 ký tự...">
           </div>
 
           <button type="submit" class="btn btn-primary" style="width: 100%;">Lưu Thay Đổi</button>

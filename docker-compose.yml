@@ -1,6 +1,6 @@
 # ==============================================================================
-# VNnettruyen - Hệ Thống Đọc và Sáng Tác Truyện Việt Nam
-# Docker Compose Orchestration: Webapp, MySQL, phpMyAdmin, Nginx, Prometheus, Grafana, Loki, Promtail
+# VNnettruyen - Hệ Thống Diễn Đàn Đọc và Sáng Tác Truyện Việt Nam
+# Docker Compose Orchestration (Hỗ trợ Live Edit VS Code song song Container)
 # ==============================================================================
 
 services:
@@ -25,17 +25,18 @@ services:
       timeout: 5s
       retries: 5
       start_period: 25s
-    # Hardening: Không expose port 3306 ra ngoài Internet
+    # Hardening: Không expose port 3306 ra ngoài host
 
-  # 2. Ứng dụng Web Node.js + Express (Webapp)
+  # 2. Ứng dụng Web Node.js + Express (Webapp - Hỗ trợ Hot Reload qua VS Code)
   webapp:
     build:
       context: ./app
       dockerfile: Dockerfile
     container_name: vnnettruyen-webapp
     restart: unless-stopped
+    command: ["node", "--watch", "src/app.js"]
     environment:
-      NODE_ENV: ${NODE_ENV:-production}
+      NODE_ENV: ${NODE_ENV:-development}
       PORT: 3000
       SESSION_SECRET: ${SESSION_SECRET:-vnnettruyen_secure_session_secret_2026}
       DB_HOST: mysql
@@ -44,6 +45,10 @@ services:
       DB_USER: ${DB_USER:-vnnettruyen_user}
       DB_PASSWORD: ${DB_PASSWORD:-VNnet_DbPass_2026!}
     volumes:
+      # Bind mount mã nguồn từ máy thật vào container để chỉnh sửa trực tiếp qua VS Code
+      - ./app:/usr/src/app
+      # Giữ nguyên node_modules trong container
+      - /usr/src/app/node_modules
       - app_logs:/usr/src/app/logs
     networks:
       - backend_net
@@ -184,8 +189,8 @@ services:
 
 networks:
   backend_net:
-    driver: bridge
     name: vnnettruyen_backend_net
+    driver: bridge
 
 volumes:
   mysql_data:

@@ -1,43 +1,53 @@
   </main>
 
-  <!-- Footer -->
-  <footer class="footer">
+  <!-- Floating Quick Helper (Góc dưới bên phải) -->
+  <div id="floating-helper-widget" class="floating-helper">
+    <span id="close-floating-helper" style="cursor: pointer; opacity: 0.7; font-size: 0.9rem;" title="Đóng">✕</span>
+    <img src="/public/images/mascot.png" alt="Mascot" class="floating-mascot-img">
+    <a href="/stories" style="color: inherit;">📖 Khám phá truyện</a>
+  </div>
+
+  <!-- Diễn Đàn Footer -->
+  <footer class="forum-footer">
     <div class="container">
       <div class="footer-grid">
         <div>
-          <h3 style="color: var(--accent-primary); font-size: 1.3rem; margin-bottom: 12px; font-weight: 800;">VNnettruyen</h3>
-          <p style="font-size: 0.88rem; line-height: 1.7; margin-bottom: 14px;">
-            Cộng đồng đọc và sáng tác truyện trực tuyến Việt Nam. Nền tảng chia sẻ tiểu thuyết, kiếm hiệp, tiên hiệp, dã sử và văn học mạng hoàn toàn phi thương mại, tôn trọng tác quyền sáng tạo của cộng đồng.
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+            <img src="/public/images/logo.png" alt="VNnettruyen" style="width: 36px; height: 36px; border-radius: 50%;">
+            <h3 style="color: #f59e0b; font-size: 1.25rem; font-weight: 800;">VNnettruyen.vn</h3>
+          </div>
+          <p style="font-size: 0.85rem; line-height: 1.7; color: #94a3b8; margin-bottom: 12px;">
+            Cộng đồng diễn đàn đọc và sáng tác truyện trực tuyến Việt Nam. Nơi hội tụ tinh hoa văn học mạng, tiểu thuyết kiếm hiệp, tiên hiệp, dã sử và truyện ngắn đặc sắc do cộng đồng tác giả Việt sáng tác.
           </p>
-          <p style="font-size: 0.8rem; color: var(--text-muted);">
-            Phiên bản đồ án hệ thống: v1.0.0 (Node.js, MySQL, Docker, Nginx, Prometheus, Grafana, Loki)
+          <p style="font-size: 0.78rem; color: #64748b;">
+            Đồ án Triển khai & Quản trị Hệ thống Phần mềm (Đề 15: Forum / Cộng đồng)
           </p>
         </div>
 
         <div>
-          <h4 style="font-size: 1rem; color: var(--text-primary); margin-bottom: 12px;">Liên kết nhanh</h4>
-          <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.88rem;">
-            <li><a href="/" style="color: var(--text-secondary);">Trang chủ</a></li>
-            <li><a href="/stories" style="color: var(--text-secondary);">Danh sách truyện</a></li>
-            <li><a href="/auth/login" style="color: var(--text-secondary);">Đăng nhập</a></li>
-            <li><a href="/auth/register" style="color: var(--text-secondary);">Đăng ký tài khoản</a></li>
-            <li><a href="/health" target="_blank" style="color: var(--accent-secondary);">Kiểm tra Healthcheck</a></li>
+          <h4 style="font-size: 0.95rem; color: #ffffff; margin-bottom: 12px; font-weight: 700;">Chuyên mục diễn đàn</h4>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem;">
+            <li><a href="/" style="color: #94a3b8;">Trang chủ diễn đàn</a></li>
+            <li><a href="/stories" style="color: #94a3b8;">Thư viện tác phẩm</a></li>
+            <li><a href="/author" style="color: #94a3b8;">Studio sáng tác truyện</a></li>
+            <li><a href="/auth/register" style="color: #94a3b8;">Đăng ký thành viên</a></li>
+            <li><a href="/health" target="_blank" style="color: #38bdf8;">Kiểm tra kết nối Healthcheck</a></li>
           </ul>
         </div>
 
         <div>
-          <h4 style="font-size: 1rem; color: var(--text-primary); margin-bottom: 12px;">Giám sát & Vận hành</h4>
-          <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.88rem;">
-            <li><a href="/metrics" target="_blank" style="color: var(--text-secondary);">Prometheus Metrics</a></li>
-            <li><a href="http://localhost:3001" target="_blank" style="color: var(--text-secondary);">Grafana Dashboard (:3001)</a></li>
-            <li><a href="http://localhost:9090" target="_blank" style="color: var(--text-secondary);">Prometheus Targets (:9090)</a></li>
-            <li><a href="http://localhost:8080" target="_blank" style="color: var(--text-secondary);">phpMyAdmin (:8080)</a></li>
+          <h4 style="font-size: 0.95rem; color: #ffffff; margin-bottom: 12px; font-weight: 700;">Hạ tầng & Giám sát</h4>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem;">
+            <li><a href="/metrics" target="_blank" style="color: #94a3b8;">⚡ Prometheus Metrics (/metrics)</a></li>
+            <li><a href="http://localhost:3001" target="_blank" style="color: #94a3b8;">📈 Grafana Dashboard (:3001)</a></li>
+            <li><a href="http://localhost:9090/targets" target="_blank" style="color: #94a3b8;">🎯 Prometheus Targets (:9090)</a></li>
+            <li><a href="http://localhost:8080" target="_blank" style="color: #94a3b8;">🗄️ phpMyAdmin Database (:8080)</a></li>
           </ul>
         </div>
       </div>
 
       <div class="footer-bottom">
-        <p>&copy; 2026 VNnettruyen System. Triển khai theo đồ án Đề 15: Diễn đàn/Cộng đồng.</p>
+        <p>&copy; 2026 VNnettruyen Forum System. Triển khai hoàn chỉnh trên Docker Compose, Nginx, Prometheus, Grafana, Loki.</p>
       </div>
     </div>
   </footer>

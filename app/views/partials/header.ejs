@@ -1,74 +1,151 @@
 <!DOCTYPE html>
-<html lang="vi" data-theme="dark">
+<html lang="vi" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= typeof title !== 'undefined' ? title : 'VNnettruyen - Diễn Đàn Đọc và Sáng Tác Truyện Việt Nam' %></title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/public/css/style.css">
 </head>
 <body>
 
-  <!-- Header Navigation -->
-  <header class="navbar">
-    <div class="container nav-container">
-      <a href="/" class="nav-brand">
-        📚 <span>VNnet</span>truyen
+  <!-- 1. Top Header Bar (Cam Vàng Rực Rỡ) -->
+  <header class="top-header-bar">
+    <div class="container top-header-container">
+      <!-- Logo thương hiệu -->
+      <a href="/" class="brand-wrapper">
+        <img src="/public/images/logo.png" alt="VNnettruyen Logo" class="brand-logo-img">
+        <div class="brand-text">
+          <div class="brand-title">VNnet<span>truyen</span></div>
+          <div class="brand-tagline">Cộng đồng đọc & sáng tác truyện</div>
+        </div>
       </a>
 
-      <!-- Quick Search -->
-      <div class="nav-search">
+      <!-- Thanh tìm kiếm nhanh -->
+      <div class="header-search">
         <span class="search-icon">🔍</span>
         <input type="text" id="navbar-search-input" placeholder="Tìm kiếm truyện, tác giả..." autocomplete="off">
         <div id="navbar-search-results" class="search-results-dropdown"></div>
       </div>
 
-      <!-- Navigation Links -->
-      <ul class="nav-menu">
-        <li><a href="/" class="nav-link <%= currentPath === '/' ? 'active' : '' %>">Trang chủ</a></li>
-        <li><a href="/stories" class="nav-link <%= currentPath.startsWith('/stories') ? 'active' : '' %>">Khám phá</a></li>
-        
-        <% if (currentUser && (currentUser.role === 'author' || currentUser.role === 'admin')) { %>
-          <li><a href="/author" class="nav-link <%= currentPath.startsWith('/author') ? 'active' : '' %>">✍️ Sáng tác</a></li>
-        <% } %>
+      <!-- Khu vực nút chức năng & Tài khoản thành viên -->
+      <div class="header-auth-actions">
+        <a href="/author/stories/create" class="header-btn header-btn-post">
+          <span>➕</span> Đăng bài
+        </a>
 
-        <% if (currentUser && currentUser.role === 'admin') { %>
-          <li><a href="/admin" class="nav-link <%= currentPath.startsWith('/admin') ? 'active' : '' %>">🛡️ Quản trị</a></li>
-        <% } %>
-      </ul>
-
-      <!-- User Actions -->
-      <div class="nav-actions">
         <% if (currentUser) { %>
-          <a href="/profile" class="nav-link" style="display: flex; align-items: center; gap: 8px;">
-            <img src="<%= currentUser.avatar %>" alt="<%= currentUser.username %>" class="user-avatar-sm" onerror="this.src='/public/images/default-avatar.png'">
-            <span><%= currentUser.username %></span>
-            <span class="badge badge-<%= currentUser.role %>"><%= currentUser.role %></span>
+          <a href="/profile" class="header-btn" style="background-color: rgba(255, 255, 255, 0.2);">
+            <span class="user-badge-coins" id="user-header-coins">💰 <%= currentUser.coins || 50 %> Xu</span>
+            <span>👤 <%= currentUser.username %></span>
           </a>
-          <a href="/auth/logout" class="btn btn-secondary btn-sm">Đăng xuất</a>
+          <% if (currentUser.role === 'admin') { %>
+            <a href="/admin" class="header-btn" style="background-color: #ef4444;">🛡️ Admin</a>
+          <% } %>
+          <a href="/auth/logout" class="header-btn" title="Đăng xuất">Đăng xuất</a>
         <% } else { %>
-          <a href="/auth/login" class="btn btn-secondary btn-sm">Đăng nhập</a>
-          <a href="/auth/register" class="btn btn-primary btn-sm">Đăng ký</a>
+          <a href="/auth/login" class="header-btn">
+            <span>➜</span> Đăng nhập
+          </a>
+          <a href="/auth/register" class="header-btn">
+            <span>📝</span> Đăng ký
+          </a>
+          <a href="/auth/login" class="header-btn" style="opacity: 0.9;">
+            <span>🔑</span> Quên MK
+          </a>
         <% } %>
       </div>
     </div>
   </header>
 
+  <!-- 2. Main Navigation Bar (Xanh Đen Slate) -->
+  <nav class="main-nav-bar">
+    <div class="container">
+      <ul class="main-nav-list">
+        <li class="main-nav-item">
+          <a href="/" class="main-nav-link <%= currentPath === '/' ? 'active' : '' %>">Trang chủ</a>
+        </li>
+
+        <li class="main-nav-item">
+          <a href="/stories" class="main-nav-link <%= currentPath.startsWith('/stories') ? 'active' : '' %>">
+            Đọc Truyện ▾
+          </a>
+          <!-- Mega-Menu thể loại truyện -->
+          <div class="nav-dropdown">
+            <% if (typeof genres !== 'undefined' && genres && genres.length > 0) { %>
+              <% genres.forEach(g => { %>
+                <a href="/stories?genre=<%= g.slug %>" class="nav-dropdown-item">
+                  <span>📖</span> <%= g.name %>
+                </a>
+              <% }) %>
+            <% } else { %>
+              <a href="/stories?genre=tien-hiep" class="nav-dropdown-item">Tiên Hiệp</a>
+              <a href="/stories?genre=kiem-hiep" class="nav-dropdown-item">Kiếm Hiệp</a>
+              <a href="/stories?genre=da-su-viet" class="nav-dropdown-item">Dã Sử Việt</a>
+              <a href="/stories?genre=huyen-huyen" class="nav-dropdown-item">Huyền Huyễn</a>
+              <a href="/stories?genre=do-thi" class="nav-dropdown-item">Đô Thị</a>
+              <a href="/stories?genre=khoa-huyen" class="nav-dropdown-item">Khoa Huyễn</a>
+              <a href="/stories?genre=trinh-tham-kinh-di" class="nav-dropdown-item">Trinh Thám</a>
+            <% } %>
+          </div>
+        </li>
+
+        <li class="main-nav-item">
+          <a href="/stories?genre=da-su-viet" class="main-nav-link">Góc Tâm Hồn</a>
+        </li>
+
+        <li class="main-nav-item">
+          <a href="/stories" class="main-nav-link">Nghệ Thuật – Giải Trí</a>
+        </li>
+
+        <li class="main-nav-item">
+          <a href="/stories" class="main-nav-link">Học Văn</a>
+        </li>
+
+        <li class="main-nav-item">
+          <a href="/author" class="main-nav-link <%= currentPath.startsWith('/author') ? 'active' : '' %>">
+            ✍️ Sáng Tác
+          </a>
+        </li>
+
+        <li class="main-nav-item">
+          <a href="/stories?sort=views" class="main-nav-link">Bảng Xếp Hạng</a>
+        </li>
+
+        <li class="main-nav-item" style="margin-left: auto;">
+          <a href="#farm" class="main-nav-link main-nav-link-farm">VNnet Farm</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- 3. Sub-genre Quick Access Strip (Dải thể loại phụ) -->
+  <div class="sub-genre-strip">
+    <div class="container sub-genre-grid">
+      <a href="/stories?genre=tien-hiep" class="sub-genre-link">Tiên Hiệp</a>
+      <a href="/stories?genre=kiem-hiep" class="sub-genre-link">Kiếm Hiệp</a>
+      <a href="/stories?genre=da-su-viet" class="sub-genre-link">Dã Sử Việt</a>
+      <a href="/stories?genre=huyen-huyen" class="sub-genre-link">Huyền Huyễn</a>
+      <a href="/stories?genre=do-thi" class="sub-genre-link">Đô Thị</a>
+      <a href="/stories?genre=khoa-huyen" class="sub-genre-link">Khoa Huyễn</a>
+      <a href="/stories?genre=trinh-tham-kinh-di" class="sub-genre-link">Trinh Thám - Kinh Dị</a>
+      <a href="/stories?status=completed" class="sub-genre-link">Truyện Hoàn Thành</a>
+    </div>
+  </div>
+
   <!-- Flash Messages -->
   <div class="container" style="margin-top: 15px;">
     <% if (success_msg && success_msg.length > 0) { %>
-      <div class="alert alert-success">
-        <span>✅</span>
-        <div><%= success_msg %></div>
+      <div style="background-color: #dcfce7; border: 1px solid #16a34a; color: #166534; padding: 12px 16px; border-radius: 6px; margin-bottom: 15px; font-weight: 600;">
+        ✅ <%= success_msg %>
       </div>
     <% } %>
 
     <% if (error_msg && error_msg.length > 0) { %>
-      <div class="alert alert-error">
-        <span>⚠️</span>
-        <div><%= error_msg %></div>
+      <div style="background-color: #fee2e2; border: 1px solid #dc2626; color: #991b1b; padding: 12px 16px; border-radius: 6px; margin-bottom: 15px; font-weight: 600;">
+        ⚠️ <%= error_msg %>
       </div>
     <% } %>
   </div>

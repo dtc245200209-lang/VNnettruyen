@@ -1,119 +1,364 @@
 <%- include('../partials/header') %>
 
-<!-- 1. Featured Stories Hero -->
-<section class="hero-section">
-  <div class="section-header">
-    <h2 class="section-title">⭐ Tác Phẩm Nổi Bật</h2>
-    <a href="/stories?sort=views" class="section-link">Xem tất cả &rarr;</a>
+<!-- ==============================================================================
+     1. TOP VIEW TUẦN (Shelf ngang trên cùng)
+     ============================================================================== -->
+<section class="top-shelf-card">
+  <div class="top-shelf-header">
+    <span>🏆</span> Top View Tuần
   </div>
 
-  <div class="story-grid">
-    <% if (featuredStories && featuredStories.length > 0) { %>
-      <% featuredStories.forEach(story => { %>
-        <div class="story-card">
-          <div class="story-cover-wrap">
-            <a href="/stories/<%= story.slug %>">
-              <img src="<%= story.cover_image %>" alt="<%= story.title %>" class="story-cover" onerror="this.src='/public/images/default-cover.png'">
-            </a>
-            <span class="story-badge">⭐ Hot</span>
-          </div>
-          <div class="story-info">
-            <a href="/stories/<%= story.slug %>">
-              <h3 class="story-title" title="<%= story.title %>"><%= story.title %></h3>
-            </a>
-            <div class="story-author">Tác giả: <strong><%= story.author_name %></strong></div>
-            <div class="story-meta">
-              <span>📖 <%= story.total_chapters %> chương</span>
-              <span>👁️ <%= story.views %></span>
-            </div>
+  <div class="top-shelf-list">
+    <% if (topWeeklyStories && topWeeklyStories.length > 0) { %>
+      <% topWeeklyStories.forEach(story => { %>
+        <div class="top-shelf-item">
+          <a href="/stories/<%= story.slug %>">
+            <img src="<%= story.cover_image %>" alt="<%= story.title %>" class="top-shelf-cover" onerror="this.src='/public/images/cover-1.jpg'">
+          </a>
+          <a href="/stories/<%= story.slug %>">
+            <h4 class="top-shelf-title" title="<%= story.title %>"><%= story.title %></h4>
+          </a>
+          <div class="top-shelf-author">
+            <span>👤</span> <%= story.author_name %>
           </div>
         </div>
       <% }) %>
-    <% } else { %>
-      <div style="grid-column: 1 / -1; padding: 30px; text-align: center; color: var(--text-muted);">
-        Chưa có truyện nổi bật nào được thiết lập.
-      </div>
     <% } %>
   </div>
 </section>
 
-<!-- 2. Main Layout: Latest Updates + Sidebar -->
-<div class="main-layout">
-  <!-- Left Column: Latest Stories -->
-  <section>
-    <div class="section-header">
-      <h2 class="section-title">🔥 Truyện Mới Cập Nhật</h2>
-      <a href="/stories?sort=latest" class="section-link">Xem thêm &rarr;</a>
-    </div>
-
-    <div class="story-grid">
-      <% if (latestStories && latestStories.length > 0) { %>
-        <% latestStories.forEach(story => { %>
-          <div class="story-card">
-            <div class="story-cover-wrap">
-              <a href="/stories/<%= story.slug %>">
-                <img src="<%= story.cover_image %>" alt="<%= story.title %>" class="story-cover" onerror="this.src='/public/images/default-cover.png'">
-              </a>
-              <span class="story-badge <%= story.status === 'completed' ? 'badge-completed' : 'badge-ongoing' %>">
-                <%= story.status === 'completed' ? 'Hoàn thành' : 'Đang ra' %>
-              </span>
-            </div>
-            <div class="story-info">
-              <a href="/stories/<%= story.slug %>">
-                <h3 class="story-title" title="<%= story.title %>"><%= story.title %></h3>
-              </a>
-              <div class="story-author">Tác giả: <%= story.author_name %></div>
-              
-              <% if (story.latest_chapter_number) { %>
-                <div style="font-size: 0.8rem; margin-bottom: 6px;">
-                  <a href="/stories/<%= story.slug %>/chapters/<%= story.latest_chapter_number %>" style="color: var(--accent-secondary);">
-                    Chương <%= story.latest_chapter_number %>
-                  </a>
-                </div>
-              <% } %>
-
-              <div class="story-meta">
-                <span><%= story.genres_list ? story.genres_list.split(',')[0] : 'Văn học' %></span>
-                <span>👁️ <%= story.views %></span>
-              </div>
-            </div>
-          </div>
-        <% }) %>
-      <% } else { %>
-        <div style="grid-column: 1 / -1; padding: 40px; text-align: center; color: var(--text-muted);">
-          Hiện tại chưa có truyện nào được đăng tải.
+<!-- ==============================================================================
+     2. SPOTLIGHT BANNER (Tác phẩm tiêu biểu)
+     ============================================================================== -->
+<% if (spotlightStory) { %>
+  <section class="spotlight-wrapper">
+    <img src="/public/images/banner-spotlight.jpg" alt="Spotlight" class="spotlight-bg-img">
+    <div class="spotlight-overlay-box">
+      <div>
+        <div style="font-size: 0.75rem; color: #fcd34d; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">
+          ⭐ Tác Phẩm Nổi Bật Trong Tuần
         </div>
-      <% } %>
+        <h2 class="spotlight-title"><%= spotlightStory.title %></h2>
+        
+        <div class="spotlight-meta-line">
+          Tác giả: <strong><%= spotlightStory.author_name %></strong>
+        </div>
+        <div class="spotlight-meta-line">
+          Thể loại: <strong><%= spotlightStory.primary_genre || 'Tiên Hiệp / Dã Sử' %></strong>
+        </div>
+        <div class="spotlight-meta-line">
+          Lượt xem: <strong><%= spotlightStory.views %></strong>
+        </div>
+
+        <div class="spotlight-desc">
+          "<%= spotlightStory.description %>"
+        </div>
+      </div>
+
+      <a href="/stories/<%= spotlightStory.slug %>" class="btn btn-spotlight-read">
+        📖 Đọc bài ngay
+      </a>
     </div>
   </section>
+<% } %>
 
-  <!-- Right Column: Sidebar -->
-  <aside>
-    <!-- Top Ranking -->
-    <div class="sidebar-widget">
-      <h3 class="widget-title">🏆 Top Đọc Nhiều Nhất</h3>
-      <ul class="top-ranking-list">
-        <% if (topStories && topStories.length > 0) { %>
-          <% topStories.forEach((story, idx) => { %>
-            <li class="top-ranking-item">
-              <span class="ranking-number"><%= idx + 1 %></span>
-              <div class="ranking-info">
-                <h4><a href="/stories/<%= story.slug %>"><%= story.title %></a></h4>
-                <span>👁️ <%= story.views %> lượt xem • <%= story.total_chapters %> chương</span>
-              </div>
-            </li>
-          <% }) %>
-        <% } %>
-      </ul>
+<!-- ==============================================================================
+     3. MAIN TWO-COLUMN FORUM FEED & SIDEBAR
+     ============================================================================== -->
+<div class="forum-main-layout">
+  
+  <!-- CỘT TRÁI: MAIN FEED NỘI DUNG DIỄN ĐÀN -->
+  <div>
+    <!-- 3.1. Khám Phá Thêm (Accordion / Hub links) -->
+    <div class="forum-hub-box">
+      <div class="forum-hub-header">Khám phá thêm</div>
+      <a href="/stories?genre=da-su-viet" class="forum-hub-item">
+        <span>📖 Truyện Dã Sử & Truyện Ngắn Việt</span>
+        <span>&rsaquo;</span>
+      </a>
+      <a href="/stories?genre=tien-hiep" class="forum-hub-item">
+        <span>⚔️ Tiên Hiệp & Kiếm Hiệp Chọn Lọc</span>
+        <span>&rsaquo;</span>
+      </a>
+      <a href="/stories" class="forum-hub-item">
+        <span>📚 Tủ Sách Hay Cộng Đồng Bình Chọn</span>
+        <span>&rsaquo;</span>
+      </a>
     </div>
 
-    <!-- Genres -->
-    <div class="sidebar-widget">
-      <h3 class="widget-title">🏷️ Khám Phá Thể Loại</h3>
-      <div class="genre-tags">
+    <!-- 3.2. Thanh Công Cụ Lọc Truyện Nhanh -->
+    <form action="/stories" method="GET" class="forum-filter-bar">
+      <select name="genre" class="forum-select">
+        <option value="">Chọn thể loại</option>
         <% if (genres && genres.length > 0) { %>
           <% genres.forEach(g => { %>
-            <a href="/stories?genre=<%= g.slug %>" class="genre-tag"><%= g.name %></a>
+            <option value="<%= g.slug %>"><%= g.name %></option>
+          <% }) %>
+        <% } %>
+      </select>
+
+      <select name="status" class="forum-select">
+        <option value="">Tình trạng</option>
+        <option value="ongoing">Đang tiến hành</option>
+        <option value="completed">Đã hoàn thành</option>
+      </select>
+
+      <select name="sort" class="forum-select">
+        <option value="latest">Sắp xếp: Mới nhất</option>
+        <option value="views">Lượt xem nhiều</option>
+        <option value="title">Tên A-Z</option>
+      </select>
+
+      <button type="submit" class="btn-forum-filter">Tìm kiếm</button>
+    </form>
+
+    <!-- 3.3. Thông Báo Diễn Đàn & Nội Quy (Bulletin Box with Mascot) -->
+    <div class="forum-bulletin-box">
+      <img src="/public/images/mascot.png" alt="Mascot Chibi" class="bulletin-mascot-img">
+      <div style="font-size: 0.85rem; color: #ea580c; font-weight: 800; margin-bottom: 6px;">
+        📢 BẢNG TIN & THÔNG BÁO TỪ BAN QUẢN TRỊ
+      </div>
+      <% if (announcements && announcements.length > 0) { %>
+        <% announcements.forEach(item => { %>
+          <a href="<%= item.url %>" class="bulletin-link-item" style="color: <%= item.color %>;">
+            <%= item.title %>
+          </a>
+        <% }) %>
+      <% } else { %>
+        <a href="/author" class="bulletin-link-item" style="color: #e74c3c;">
+          Kiếm tiền online: Viết truyện và chia sẻ tác phẩm tại VNnettruyen.vn
+        </a>
+        <a href="/stories" class="bulletin-link-item" style="color: #e67e22;">
+          Nội Quy Diễn Đàn & Hướng Dẫn Sáng Tác VNnettruyen
+        </a>
+      <% } %>
+    </div>
+
+    <!-- 3.4. Bảng 2 cột: Hoạt Động Mới & Chương Mới (Vnkings layout) -->
+    <div class="two-col-updates-grid">
+      <!-- Cột Trái: Hoạt động mới / Thảo luận -->
+      <div class="update-box">
+        <div class="update-box-header">
+          <span>💬 Hoạt động mới</span>
+          <a href="/stories">Xem thêm</a>
+        </div>
+        <div>
+          <% if (recentComments && recentComments.length > 0) { %>
+            <% recentComments.forEach(c => { %>
+              <div class="update-item-row">
+                <img src="<%= c.avatar || '/public/images/logo.png' %>" alt="<%= c.username %>" class="update-thumb" style="border-radius: 50%; width: 36px; height: 36px;" onerror="this.src='/public/images/logo.png'">
+                <div style="flex: 1;">
+                  <div>
+                    <span class="tag-badge tag-badge-orange">[<%= c.genre_name || 'Văn Học' %>]</span>
+                    <a href="/stories/<%= c.story_slug %>" style="font-weight: 700;">
+                      <%= c.story_title %>
+                    </a>
+                  </div>
+                  <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+                    <span style="color: #e11d48; font-weight: 600;">Bình luận:</span> <strong><%= c.username %></strong>
+                  </div>
+                  <div style="font-size: 0.8rem; color: var(--text-main); margin-top: 2px;">
+                    "<%= c.content.slice(0, 65) %>..."
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          <% } else { %>
+            <div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+              Chưa có bình luận mới.
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Cột Phải: Chương mới cập nhật -->
+      <div class="update-box">
+        <div class="update-box-header">
+          <span>⚡ Chương mới</span>
+          <a href="/stories?sort=latest">Xem nhiều hơn &raquo;</a>
+        </div>
+        <div>
+          <% if (latestChapters && latestChapters.length > 0) { %>
+            <% latestChapters.forEach(chap => { %>
+              <div class="update-item-row">
+                <div style="flex: 1;">
+                  <div>
+                    <span class="tag-badge tag-badge-new">New!</span>
+                    <a href="/stories/<%= chap.story_slug %>/chapters/<%= chap.chapter_number %>" style="font-weight: 700; color: #2563eb;">
+                      Chương <%= chap.chapter_number %>: <%= chap.chapter_title %>
+                    </a>
+                  </div>
+                  <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+                    <span>(✍️ <%= chap.author_name %> - <%= new Date(chap.updated_at).toLocaleDateString('vi-VN') %>)</span>
+                  </div>
+                  <div style="font-size: 0.82rem; margin-top: 2px;">
+                    <span style="color: #9333ea; font-weight: 600;">[<%= chap.genre_name || 'Tiểu Thuyết' %>]</span>
+                    <a href="/stories/<%= chap.story_slug %>" style="color: var(--text-main); font-weight: 600;">
+                      <%= chap.story_title %>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          <% } else { %>
+            <div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+              Chưa có chương mới.
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3.5. Khu Vực Đọc Truyện Đặc Sắc (Book Showcase) -->
+    <div class="update-box">
+      <div class="update-box-header">
+        <span>📖 ĐỌC TRUYỆN ĐẶC SẮC</span>
+        <a href="/stories">Xem toàn bộ thư viện &raquo;</a>
+      </div>
+      <div style="padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px;">
+        <% if (topWeeklyStories && topWeeklyStories.length > 0) { %>
+          <% topWeeklyStories.slice(0, 4).forEach(s => { %>
+            <div style="border: 1px solid var(--border-color); border-radius: var(--radius-sm); overflow: hidden; background-color: var(--bg-card); display: flex; flex-direction: column;">
+              <a href="/stories/<%= s.slug %>">
+                <img src="<%= s.cover_image %>" alt="<%= s.title %>" style="width: 100%; aspect-ratio: 2/3; object-fit: cover;" onerror="this.src='/public/images/cover-1.jpg'">
+              </a>
+              <div style="padding: 10px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <a href="/stories/<%= s.slug %>" style="font-weight: 700; font-size: 0.88rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                    <%= s.title %>
+                  </a>
+                  <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
+                    Tác giả: <%= s.author_name %>
+                  </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-top: 8px; border-top: 1px solid var(--border-color); padding-top: 6px;">
+                  <span>📖 <%= s.total_chapters %> ch</span>
+                  <span>👁️ <%= s.views %></span>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- CỘT PHẢI: SIDEBAR DIỄN ĐÀN (Vnkings Style) -->
+  <aside>
+    <!-- Widget 1: Dark / Light Mode Switch -->
+    <div class="sidebar-card">
+      <div class="sidebar-title">Dark Mode</div>
+      <div class="theme-switch-group">
+        <button id="btn-mode-dark" class="btn-theme-switch">
+          <span>🌙</span> Dark
+        </button>
+        <button id="btn-mode-light" class="btn-theme-switch active">
+          <span>☀️</span> Light
+        </button>
+      </div>
+    </div>
+
+    <!-- Widget 2: VNnet Farm Banner -->
+    <div class="sidebar-card" id="farm" style="padding: 0; overflow: hidden;">
+      <a href="/stories">
+        <img src="/public/images/farm-banner.jpg" alt="VNnet Farm" style="width: 100%; display: block;">
+      </a>
+    </div>
+
+    <!-- Widget 3: Điểm Danh Hằng Ngày Nhận Xu -->
+    <div class="sidebar-card">
+      <button id="btn-daily-attendance" class="btn-attendance">
+        ⭐ Điểm Danh Nhận Xu
+      </button>
+      <div style="font-size: 0.8rem; font-weight: 700; margin-bottom: 6px; color: var(--text-muted);">
+        Thành viên vừa nhận thưởng:
+      </div>
+      <div id="attendance-ticker-list" class="attendance-ticker">
+        <% if (checkinFeed && checkinFeed.length > 0) { %>
+          <% checkinFeed.forEach(item => { %>
+            <div class="attendance-ticker-item">
+              <strong><%= item.username %></strong> điểm danh thành công nhận được <span style="color: #ea580c; font-weight: 700;"><%= item.coins_earned %> Xu</span> từ hệ thống.
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="attendance-ticker-item">
+            <strong>Độc Giả VN</strong> điểm danh nhận được 5 Xu.
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Widget 4: Nhiệm Vụ Hôm Nay -->
+    <div class="sidebar-card">
+      <div class="sidebar-title">Nhiệm vụ hôm nay</div>
+      
+      <div class="task-item">
+        <div>
+          <div style="font-weight: 700;">Nhiệm vụ Đọc truyện</div>
+          <div style="color: var(--text-muted); font-size: 0.75rem;">Đọc ít nhất 1 chương truyện [3 Xu]</div>
+        </div>
+        <button class="btn btn-task-claim">Nhận xu</button>
+      </div>
+
+      <div class="task-item">
+        <div>
+          <div style="font-weight: 700;">Nhiệm vụ Tủ sách</div>
+          <div style="color: var(--text-muted); font-size: 0.75rem;">Thêm truyện vào tủ sách [3 Xu]</div>
+        </div>
+        <button class="btn btn-task-claim">Nhận xu</button>
+      </div>
+
+      <div class="task-item">
+        <div>
+          <div style="font-weight: 700;">Nhiệm vụ Bình luận</div>
+          <div style="color: var(--text-muted); font-size: 0.75rem;">Gửi bình luận thảo luận [5 Xu]</div>
+        </div>
+        <button class="btn btn-task-claim">Nhận xu</button>
+      </div>
+    </div>
+
+    <!-- Widget 5: Hoạt Động Chung Cộng Đồng -->
+    <div class="sidebar-card">
+      <div class="sidebar-title">Hoạt động chung</div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <% if (communityActivities && communityActivities.length > 0) { %>
+          <% communityActivities.forEach(act => { %>
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">
+              <img src="<%= act.avatar || '/public/images/logo.png' %>" alt="<%= act.username %>" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;" onerror="this.src='/public/images/logo.png'">
+              <div>
+                <strong><%= act.username %></strong> đã bình luận tác phẩm <a href="/stories/<%= act.story_slug %>" style="color: #2563eb; font-weight: 600;"><%= act.story_title %></a>
+              </div>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Widget 6: Bảng Xếp Hạng Đọc Nhiều (Tabs: Tuần / Tháng / Năm / T.Bộ) -->
+    <div class="sidebar-card">
+      <div class="ranking-tabs">
+        <div class="ranking-tab-btn active">Tuần</div>
+        <div class="ranking-tab-btn">Tháng</div>
+        <div class="ranking-tab-btn">Năm</div>
+        <div class="ranking-tab-btn">T.Bộ</div>
+      </div>
+
+      <div class="ranking-list">
+        <% if (rankingStories && rankingStories.length > 0) { %>
+          <% rankingStories.forEach((r, idx) => { %>
+            <div class="ranking-row">
+              <span class="ranking-num-badge"><%= idx + 1 %></span>
+              <img src="<%= r.cover_image %>" alt="<%= r.title %>" class="ranking-row-thumb" onerror="this.src='/public/images/cover-1.jpg'">
+              <div style="flex: 1; min-width: 0;">
+                <a href="/stories/<%= r.slug %>" style="font-weight: 700; font-size: 0.82rem; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  <%= r.title %>
+                </a>
+                <div style="font-size: 0.72rem; color: var(--text-muted); display: flex; gap: 6px; margin-top: 2px;">
+                  <span>👤 <%= r.author_name %></span>
+                  <span>👁️ <%= r.views %></span>
+                </div>
+              </div>
+            </div>
           <% }) %>
         <% } %>
       </div>

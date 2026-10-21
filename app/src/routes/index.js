@@ -4,26 +4,29 @@ const storyController = require('../controllers/storyController');
 const { requireAuth } = require('../middleware/auth');
 const db = require('../config/db');
 
-// Trang chủ
+// 1. Trang chủ phong cách Diễn Đàn Sáng Tác
 router.get('/', storyController.getHome);
 
-// Khám phá truyện (tìm kiếm, lọc, phân trang)
+// 2. Khám phá truyện (tìm kiếm, lọc, phân trang)
 router.get('/stories', storyController.getStories);
 
-// Chi tiết truyện
+// 3. Chi tiết truyện
 router.get('/stories/:slug', storyController.getStoryDetail);
 
-// Đọc chương truyện
+// 4. Đọc chương truyện
 router.get('/stories/:slug/chapters/:chapterNumber', storyController.getChapter);
 
-// Bình luận (yêu cầu đăng nhập)
+// 5. Bình luận (yêu cầu đăng nhập)
 router.post('/comments', requireAuth, storyController.postComment);
 router.post('/comments/:commentId/delete', requireAuth, storyController.deleteComment);
 
-// Tủ sách cá nhân (yêu cầu đăng nhập)
+// 6. Tủ sách cá nhân (yêu cầu đăng nhập)
 router.post('/bookmark/toggle', requireAuth, storyController.toggleBookmark);
 
-// API tìm kiếm nhanh gợi ý
+// 7. API Điểm danh nhận Xu hằng ngày
+router.post('/api/checkin', storyController.postDailyCheckin);
+
+// 8. API Tìm kiếm nhanh gợi ý
 router.get('/api/search', async (req, res) => {
   const { q } = req.query;
   if (!q || q.trim() === '') {

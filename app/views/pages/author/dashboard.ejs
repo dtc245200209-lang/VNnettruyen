@@ -1,70 +1,76 @@
 <%- include('../../partials/header') %>
 
-<div style="margin: 30px 0;">
-  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
-    <div>
-      <h1 class="section-title">✍️ Studio Tác Giả</h1>
-      <p style="color: var(--text-secondary); font-size: 0.9rem;">Quản lý các tác phẩm truyện và nội dung sáng tác của bạn</p>
-    </div>
-    <a href="/author/stories/create" class="btn btn-primary">➕ Đăng Tác Phẩm Mới</a>
+<div style="margin: 20px 0;">
+  <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+    <a href="/">Trang chủ</a> &gt; <strong style="color: var(--text-main);">Studio Sáng Tác</strong>
   </div>
 
-  <% if (stories && stories.length > 0) { %>
-    <div class="data-table-wrapper">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Bìa</th>
-            <th>Tên tác phẩm</th>
-            <th>Trạng thái</th>
-            <th>Số chương</th>
-            <th>Lượt đọc</th>
-            <th>Bình luận</th>
-            <th>Cập nhật cuối</th>
-            <th>Thao tác</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% stories.forEach(story => { %>
+  <div class="forum-card">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 20px;">
+      <div>
+        <h1 style="font-size: 1.4rem; font-weight: 800; color: var(--text-main);">✍️ Studio Tác Giả & Sáng Tác Truyện</h1>
+        <p style="color: var(--text-muted); font-size: 0.85rem;">Quản lý các tác phẩm tiểu thuyết và chương truyện của bạn trên VNnettruyen</p>
+      </div>
+      <a href="/author/stories/create" class="btn btn-primary">➕ Đăng Tác Phẩm Mới</a>
+    </div>
+
+    <% if (stories && stories.length > 0) { %>
+      <div class="data-table-wrapper">
+        <table class="data-table">
+          <thead>
             <tr>
-              <td style="width: 60px;">
-                <img src="<%= story.cover_image %>" alt="<%= story.title %>" style="width: 44px; height: 60px; object-fit: cover; border-radius: 4px;" onerror="this.src='/public/images/default-cover.png'">
-              </td>
-              <td>
-                <a href="/stories/<%= story.slug %>" target="_blank" style="font-weight: 700; color: var(--accent-secondary);">
-                  <%= story.title %>
-                </a>
-              </td>
-              <td>
-                <span class="badge <%= story.status === 'completed' ? 'badge-completed' : 'badge-ongoing' %>">
-                  <%= story.status === 'completed' ? 'Hoàn thành' : 'Đang ra' %>
-                </span>
-              </td>
-              <td><strong><%= story.chapter_count %></strong> chương</td>
-              <td>👁️ <%= story.views %></td>
-              <td>💬 <%= story.comment_count %></td>
-              <td style="font-size: 0.8rem; color: var(--text-muted);"><%= new Date(story.updated_at).toLocaleDateString('vi-VN') %></td>
-              <td>
-                <div style="display: flex; gap: 6px; align-items: center;">
-                  <a href="/author/stories/<%= story.id %>/chapters" class="btn btn-secondary btn-sm" title="Quản lý chương">📑 Viết chương</a>
-                  <a href="/author/stories/<%= story.id %>/edit" class="btn btn-secondary btn-sm" title="Sửa thông tin">✏️ Sửa</a>
-                  <form action="/author/stories/<%= story.id %>/delete" method="POST" class="confirm-delete" data-confirm-message="Bạn có chắc chắn muốn xóa toàn bộ tác phẩm này và tất cả các chương liên quan?">
-                    <button type="submit" class="btn btn-danger btn-sm" title="Xóa truyện">🗑️</button>
-                  </form>
-                </div>
-              </td>
+              <th>Bìa</th>
+              <th>Tên tác phẩm</th>
+              <th>Trạng thái</th>
+              <th>Số chương</th>
+              <th>Lượt xem</th>
+              <th>Bình luận</th>
+              <th>Cập nhật cuối</th>
+              <th>Thao tác</th>
             </tr>
-          <% }) %>
-        </tbody>
-      </table>
-    </div>
-  <% } else { %>
-    <div style="background-color: var(--bg-card); border: 1px dashed var(--border-color); border-radius: var(--radius-lg); padding: 60px 20px; text-align: center;">
-      <h3 style="margin-bottom: 12px;">Bạn chưa đăng tải tác phẩm nào</h3>
-      <p style="color: var(--text-muted); margin-bottom: 24px;">Hãy bắt đầu chia sẻ câu chuyện đầu tiên của bạn với độc giả VNnettruyen ngay hôm nay!</p>
-      <a href="/author/stories/create" class="btn btn-primary btn-lg">➕ Đăng Tác Phẩm Đầu Tiên</a>
-    </div>
-  <% } %>
+          </thead>
+          <tbody>
+            <% stories.forEach(story => { %>
+              <tr>
+                <td style="width: 50px;">
+                  <img src="<%= story.cover_image %>" alt="<%= story.title %>" style="width: 42px; height: 58px; object-fit: cover; border-radius: 3px;" onerror="this.src='/public/images/cover-1.jpg'">
+                </td>
+                <td>
+                  <a href="/stories/<%= story.slug %>" target="_blank" style="font-weight: 700; color: #2563eb;">
+                    <%= story.title %>
+                  </a>
+                </td>
+                <td>
+                  <span style="font-weight: 700; font-size: 0.8rem; color: <%= story.status === 'completed' ? '#16a34a' : '#ea580c' %>;">
+                    <%= story.status === 'completed' ? 'Hoàn thành' : 'Đang ra' %>
+                  </span>
+                </td>
+                <td><strong><%= story.chapter_count %></strong> chương</td>
+                <td>👁️ <%= story.views %></td>
+                <td>💬 <%= story.comment_count %></td>
+                <td style="font-size: 0.78rem; color: var(--text-muted);"><%= new Date(story.updated_at).toLocaleDateString('vi-VN') %></td>
+                <td>
+                  <div style="display: flex; gap: 6px;">
+                    <a href="/author/stories/<%= story.id %>/chapters" class="btn btn-secondary btn-sm">📑 Chương</a>
+                    <a href="/author/stories/<%= story.id %>/edit" class="btn btn-secondary btn-sm">✏️ Sửa</a>
+                    <form action="/author/stories/<%= story.id %>/delete" method="POST" class="confirm-delete" data-confirm-message="Bạn có chắc chắn muốn xóa tác phẩm này?">
+                      <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div style="text-align: center; padding: 50px 20px; background-color: var(--bg-card-header); border: 1px dashed var(--border-color); border-radius: var(--radius-sm);">
+        <h3 style="margin-bottom: 8px;">Bạn chưa có tác phẩm nào</h3>
+        <p style="color: var(--text-muted); margin-bottom: 16px; font-size: 0.9rem;">Hãy bắt đầu sáng tác và chia sẻ câu chuyện đầu tiên của bạn với độc giả VNnettruyen ngay!</p>
+        <a href="/author/stories/create" class="btn btn-primary">➕ Đăng Tác Phẩm Đầu Tiên</a>
+      </div>
+    <% } %>
+  </div>
 </div>
 
 <%- include('../../partials/footer') %>
