@@ -4,8 +4,8 @@
    ============================================================================== */
 
 :root {
-  --font-main: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
-  --font-serif: 'Merriweather', 'Georgia', serif;
+  --font-main: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+  --font-serif: 'Merriweather', 'Lora', Georgia, 'Times New Roman', serif;
 
   /* Bảng màu diễn đàn */
   --header-orange-top: #f59e0b;
@@ -353,32 +353,40 @@ a:hover {
   color: var(--accent-link);
 }
 
-/* Dải Menu thể loại phụ (Sub-header quick categories) */
+/* Dải Menu thể loại phụ (Sub-header quick categories phong cách Vnkings) */
 .sub-genre-strip {
   background-color: var(--bg-card);
   border-bottom: 1px solid var(--border-color);
-  padding: 10px 0;
+  padding: 8px 0;
 }
 
 .sub-genre-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 14px;
   text-align: center;
 }
 
 .sub-genre-link {
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--text-muted);
-  padding: 4px 8px;
+  color: #0284c7;
+  padding: 3px 6px;
   border-radius: var(--radius-sm);
   transition: all 0.15s;
+  white-space: nowrap;
+}
+
+[data-theme="dark"] .sub-genre-link {
+  color: #38bdf8;
 }
 
 .sub-genre-link:hover {
-  color: var(--accent-link);
-  background-color: rgba(245, 158, 11, 0.1);
+  color: #0369a1;
+  text-decoration: underline;
+  background-color: rgba(2, 132, 199, 0.08);
 }
 
 /* ==============================================================================

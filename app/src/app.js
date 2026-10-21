@@ -118,6 +118,7 @@ app.use(attachUser);
 // 9. Template engine EJS & Static files
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../views'));
+app.disable('view cache'); // Đảm bảo EJS cập nhật ngay lập tức khi chỉnh sửa file trong VS Code
 app.use('/public', express.static(path.join(__dirname, '../public')));
 
 // 10. Endpoint kiểm tra sức khỏe hệ thống (Healthcheck)
