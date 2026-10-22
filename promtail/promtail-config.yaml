@@ -21,7 +21,7 @@ scrape_configs:
         labels:
           job: nginx
           env: production
-          __path__: /var/log/nginx/*.log
+          __path__: /var/log/nginx/nginx_*.log
 
   # 2. Thu thập Log từ Node.js Web Application
   - job_name: webapp

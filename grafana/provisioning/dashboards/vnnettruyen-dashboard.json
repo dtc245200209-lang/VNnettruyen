@@ -89,13 +89,13 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "Prometheus" },
-          "expr": "process_resident_memory_bytes{job=\"vnnettruyen-webapp\"}",
+          "expr": "vnnettruyen_process_resident_memory_bytes{job=\"vnnettruyen-webapp\"}",
           "legendFormat": "RSS Memory",
           "refId": "A"
         },
         {
           "datasource": { "type": "prometheus", "uid": "Prometheus" },
-          "expr": "nodejs_heap_size_used_bytes{job=\"vnnettruyen-webapp\"}",
+          "expr": "vnnettruyen_nodejs_heap_size_used_bytes{job=\"vnnettruyen-webapp\"}",
           "legendFormat": "Heap Used",
           "refId": "B"
         }
@@ -117,7 +117,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "Prometheus" },
-          "expr": "rate(process_cpu_seconds_total{job=\"vnnettruyen-webapp\"}[1m])",
+          "expr": "rate(vnnettruyen_process_cpu_seconds_total{job=\"vnnettruyen-webapp\"}[1m])",
           "legendFormat": "CPU Usage",
           "refId": "A"
         }

@@ -631,6 +631,7 @@ a:hover {
   width: 100%;
   height: 320px;
   object-fit: cover;
+  object-position: left center;
   display: block;
 }
 
@@ -639,58 +640,114 @@ a:hover {
   top: 20px;
   right: 20px;
   bottom: 20px;
-  max-width: 440px;
-  background-color: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  max-width: 480px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 41, 59, 0.88) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-md);
-  padding: 24px;
+  padding: 24px 26px;
   color: #ffffff;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  z-index: 2;
+}
+
+.spotlight-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fde68a;
+  background: rgba(245, 158, 11, 0.16);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  padding: 4px 12px;
+  border-radius: 9999px;
+  margin-bottom: 10px;
+  width: fit-content;
 }
 
 .spotlight-title {
-  font-size: 1.3rem;
+  font-size: 1.45rem;
   font-weight: 800;
-  color: #fbbf24;
-  margin-bottom: 10px;
-}
-
-.spotlight-meta-line {
-  font-size: 0.86rem;
-  color: #e2e8f0;
-  margin-bottom: 4px;
-}
-
-.spotlight-meta-line strong {
+  line-height: 1.35;
   color: #ffffff;
+  margin-bottom: 12px;
+  letter-spacing: -0.015em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.spotlight-title a {
+  color: #ffffff;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.spotlight-title a:hover {
+  color: #fbbf24;
+}
+
+.spotlight-tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.spotlight-tag {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 4px 10px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .spotlight-desc {
   font-size: 0.85rem;
   color: #cbd5e1;
-  line-height: 1.6;
-  margin: 12px 0;
+  line-height: 1.65;
+  margin: 0 0 16px 0;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  border-left: 3px solid #f59e0b;
+  padding: 4px 12px;
+  font-style: italic;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 0 6px 6px 0;
 }
 
 .btn-spotlight-read {
   align-self: flex-start;
-  background-color: var(--header-orange-top);
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
   color: #ffffff;
   font-weight: 700;
   font-size: 0.88rem;
-  padding: 8px 20px;
-  border-radius: var(--radius-sm);
+  padding: 9px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.4);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+  text-decoration: none;
 }
 
 .btn-spotlight-read:hover {
-  background-color: var(--header-orange-bottom);
+  background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(234, 88, 12, 0.5);
   color: #ffffff;
 }
 
@@ -796,20 +853,7 @@ a:hover {
   text-align: center;
 }
 
-.bulletin-mascot-img {
-  position: absolute;
-  top: 10px;
-  right: 20px;
-  width: 70px;
-  height: 70px;
-  object-fit: contain;
-  animation: floatMascot 3s ease-in-out infinite;
-}
 
-@keyframes floatMascot {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
 
 .bulletin-link-item {
   display: block;
@@ -1075,40 +1119,6 @@ a:hover {
   flex-shrink: 0;
 }
 
-/* ==============================================================================
-   5. FLOATING QUICK HELPER & MASCOT (Sticky bottom)
-   ============================================================================== */
-
-.floating-helper {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 9999px;
-  box-shadow: var(--shadow-lg);
-  padding: 8px 16px 8px 12px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  z-index: 100;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--text-main);
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.floating-helper:hover {
-  transform: translateY(-3px);
-  color: var(--accent-link);
-}
-
-.floating-mascot-img {
-  width: 34px;
-  height: 34px;
-  object-fit: contain;
-}
 
 /* ==============================================================================
    6. INNER PAGES (Story Detail, Reader, Author, Admin, Forms)
