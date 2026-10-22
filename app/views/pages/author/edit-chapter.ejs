@@ -15,13 +15,13 @@
 
         <div class="form-group">
           <label class="form-label">Tiêu đề chương <span style="color: var(--danger);">*</span></label>
-          <input type="text" name="title" class="form-control" value="<%= chapter.title %>" required>
+          <input type="text" name="title" class="form-control" value="<%= chapter.title %>" required spellcheck="false">
         </div>
       </div>
 
       <div class="form-group">
         <label class="form-label">Nội dung chương truyện <span style="color: var(--danger);">*</span></label>
-        <textarea name="content" class="form-control" rows="18" required style="line-height: 1.8; font-size: 1rem;"><%= chapter.content %></textarea>
+        <textarea name="content" class="form-control" rows="18" required spellcheck="false" style="line-height: 1.8; font-size: 1rem;"><%= chapter.content %></textarea>
       </div>
 
       <div class="form-group">

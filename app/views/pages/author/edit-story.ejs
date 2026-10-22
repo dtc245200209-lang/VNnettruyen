@@ -9,12 +9,12 @@
     <form action="/author/stories/<%= story.id %>/edit" method="POST" enctype="multipart/form-data">
       <div class="form-group">
         <label class="form-label">Tên tác phẩm <span style="color: var(--danger);">*</span></label>
-        <input type="text" name="title" class="form-control" value="<%= story.title %>" required>
+        <input type="text" name="title" class="form-control" value="<%= story.title %>" required spellcheck="false">
       </div>
 
       <div class="form-group">
         <label class="form-label">Tên tác giả / Bút danh hiển thị</label>
-        <input type="text" name="pen_name" class="form-control" value="<%= story.pen_name || '' %>" placeholder="Để trống nếu muốn dùng tên tài khoản, hoặc nhập bút danh riêng...">
+        <input type="text" name="pen_name" class="form-control" value="<%= story.pen_name || '' %>" placeholder="Để trống nếu muốn dùng tên tài khoản, hoặc nhập bút danh riêng..." spellcheck="false">
         <small style="color: var(--text-muted); font-size: 0.78rem; display: block; margin-top: 4px;">
           Bút danh này sẽ được in trang trọng trên trang đọc truyện và danh sách tác phẩm thay cho tên tài khoản.
         </small>
@@ -34,7 +34,7 @@
 
       <div class="form-group">
         <label class="form-label">Tóm tắt giới thiệu truyện <span style="color: var(--danger);">*</span></label>
-        <textarea name="description" class="form-control" rows="6" required><%= story.description %></textarea>
+        <textarea name="description" class="form-control" rows="6" required spellcheck="false"><%= story.description %></textarea>
       </div>
 
       <div class="form-group" style="background-color: var(--bg-secondary); padding: 16px; border-radius: var(--radius-md); border: 1px dashed var(--border-color);">

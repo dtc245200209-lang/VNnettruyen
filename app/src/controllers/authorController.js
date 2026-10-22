@@ -4,11 +4,12 @@ const slugify = require('slugify');
 
 // Hàm tạo slug tiếng Việt chuẩn
 function createVietnameseSlug(text) {
-  return slugify(text, {
+  const s = slugify(text || '', {
     lower: true,
     strict: true,
     locale: 'vi'
   });
+  return s && s.length > 0 ? s : `tac-pham-${Date.now()}`;
 }
 
 // 1. Dashboard Quản lý truyện của Tác giả
@@ -168,6 +169,11 @@ exports.postEditStory = async (req, res) => {
       return res.redirect('/author');
     }
 
+    if (!title || title.trim() === '' || !description || description.trim() === '') {
+      req.flash('error_msg', 'Tên tác phẩm và tóm tắt giới thiệu không được để trống!');
+      return res.redirect(`/author/stories/${storyId}/edit`);
+    }
+
     // Xử lý ảnh bìa: ưu tiên file tải lên từ máy tính
     let finalCover = cover_image && cover_image.trim() !== '' ? cover_image.trim() : (stories[0].cover_image || '/public/images/default-cover.png');
     if (req.file) {
@@ -176,12 +182,31 @@ exports.postEditStory = async (req, res) => {
 
     const finalPenName = (pen_name && pen_name.trim() !== '') ? pen_name.trim() : null;
 
+    // Cập nhật slug tương ứng nếu tên truyện thay đổi
+    let updatedSlug = stories[0].slug;
+    if (title.trim() !== stories[0].title) {
+      let candidateSlug = createVietnameseSlug(title.trim());
+      if (!candidateSlug || candidateSlug === '') {
+        candidateSlug = `story-${storyId}`;
+      }
+      const [existingSlug] = await db.query(
+        'SELECT id FROM stories WHERE slug = ? AND id != ? LIMIT 1',
+        [candidateSlug, storyId]
+      );
+      if (existingSlug.length > 0) {
+        updatedSlug = `${candidateSlug}-${storyId}`;
+      } else {
+        updatedSlug = candidateSlug;
+      }
+    }
+
     await db.query(`
       UPDATE stories 
-      SET title = ?, pen_name = ?, description = ?, cover_image = ?, status = ?, updated_at = NOW()
+      SET title = ?, slug = ?, pen_name = ?, description = ?, cover_image = ?, status = ?, updated_at = NOW()
       WHERE id = ?
     `, [
       title.trim(),
+      updatedSlug,
       finalPenName,
       description.trim(),
       finalCover,
@@ -198,12 +223,12 @@ exports.postEditStory = async (req, res) => {
       }
     }
 
-    logger.info(`Đã cập nhật tác phẩm ID ${storyId} bởi user ${userId} (${req.session.user.username})`);
+    logger.info(`Đã cập nhật tác phẩm ID ${storyId} ("${title.trim()}") bởi user ${userId} (${req.session.user.username})`);
     req.flash('success_msg', 'Cập nhật thông tin tác phẩm thành công!');
     res.redirect('/author');
   } catch (err) {
     logger.error('Lỗi cập nhật truyện:', err);
-    req.flash('error_msg', 'Lỗi cập nhật truyện!');
+    req.flash('error_msg', 'Lỗi khi cập nhật truyện: ' + (err.message || 'Lỗi hệ thống'));
     res.redirect(`/author/stories/${storyId}/edit`);
   }
 };
@@ -314,8 +339,8 @@ exports.postCreateChapter = async (req, res) => {
   const userRole = req.session.user.role;
   const { chapter_number, title, content, status } = req.body;
 
-  if (!chapter_number || !title || !content) {
-    req.flash('error_msg', 'Vui lòng nhập đầy đủ số chương, tiêu đề và nội dung!');
+  if (!chapter_number || !title || title.trim() === '' || !content || content.trim() === '') {
+    req.flash('error_msg', 'Vui lòng nhập đầy đủ số chương, tiêu đề và nội dung chương!');
     return res.redirect(`/author/stories/${storyId}/chapters/create`);
   }
 
@@ -326,12 +351,24 @@ exports.postCreateChapter = async (req, res) => {
       return res.redirect('/author');
     }
 
+    const chapNum = parseInt(chapter_number, 10) || 1;
+
+    // Kiểm tra xem số chương đã tồn tại chưa
+    const [existing] = await db.query(
+      'SELECT id FROM chapters WHERE story_id = ? AND chapter_number = ? LIMIT 1',
+      [storyId, chapNum]
+    );
+    if (existing.length > 0) {
+      req.flash('error_msg', `Số chương ${chapNum} đã tồn tại trong tác phẩm này! Vui lòng chọn số chương khác.`);
+      return res.redirect(`/author/stories/${storyId}/chapters/create`);
+    }
+
     await db.query(`
       INSERT INTO chapters (story_id, chapter_number, title, content, status)
       VALUES (?, ?, ?, ?, ?)
     `, [
       storyId,
-      parseInt(chapter_number, 10),
+      chapNum,
       title.trim(),
       content.trim(),
       status || 'published'
@@ -340,14 +377,14 @@ exports.postCreateChapter = async (req, res) => {
     // Cập nhật updated_at cho truyện
     await db.query('UPDATE stories SET updated_at = NOW() WHERE id = ?', [storyId]);
 
-    req.flash('success_msg', `Đã xuất bản chương ${chapter_number}: ${title}!`);
+    req.flash('success_msg', `Đã xuất bản chương ${chapNum}: "${title.trim()}"!`);
     res.redirect(`/author/stories/${storyId}/chapters`);
   } catch (err) {
     logger.error('Lỗi khi thêm chương mới:', err);
     if (err.code === 'ER_DUP_ENTRY') {
       req.flash('error_msg', `Số chương ${chapter_number} đã tồn tại trong truyện này!`);
     } else {
-      req.flash('error_msg', 'Lỗi hệ thống khi lưu chương!');
+      req.flash('error_msg', 'Lỗi hệ thống khi lưu chương: ' + (err.message || ''));
     }
     res.redirect(`/author/stories/${storyId}/chapters/create`);
   }
@@ -391,6 +428,11 @@ exports.postEditChapter = async (req, res) => {
   const userRole = req.session.user.role;
   const { chapter_number, title, content, status } = req.body;
 
+  if (!chapter_number || !title || title.trim() === '' || !content || content.trim() === '') {
+    req.flash('error_msg', 'Số chương, tiêu đề và nội dung chương không được để trống!');
+    return res.redirect(`/author/stories/${storyId}/chapters/${chapterId}/edit`);
+  }
+
   try {
     const [stories] = await db.query('SELECT author_id FROM stories WHERE id = ?', [storyId]);
     if (stories.length === 0 || (Number(stories[0].author_id) !== Number(userId) && userRole !== 'admin')) {
@@ -398,12 +440,24 @@ exports.postEditChapter = async (req, res) => {
       return res.redirect('/author');
     }
 
+    const chapNum = parseInt(chapter_number, 10) || 1;
+
+    // Kiểm tra xem số chương này đã trùng với một chương khác cùng truyện chưa
+    const [existingChap] = await db.query(
+      'SELECT id FROM chapters WHERE story_id = ? AND chapter_number = ? AND id != ? LIMIT 1',
+      [storyId, chapNum, chapterId]
+    );
+    if (existingChap.length > 0) {
+      req.flash('error_msg', `Số chương ${chapNum} đã tồn tại trong tác phẩm này! Vui lòng chọn số chương khác.`);
+      return res.redirect(`/author/stories/${storyId}/chapters/${chapterId}/edit`);
+    }
+
     await db.query(`
       UPDATE chapters 
       SET chapter_number = ?, title = ?, content = ?, status = ?, updated_at = NOW()
       WHERE id = ? AND story_id = ?
     `, [
-      parseInt(chapter_number, 10),
+      chapNum,
       title.trim(),
       content.trim(),
       status || 'published',
@@ -413,11 +467,11 @@ exports.postEditChapter = async (req, res) => {
 
     await db.query('UPDATE stories SET updated_at = NOW() WHERE id = ?', [storyId]);
 
-    req.flash('success_msg', 'Đã cập nhật chương thành công!');
+    req.flash('success_msg', `Đã cập nhật chương ${chapNum}: "${title.trim()}" thành công!`);
     res.redirect(`/author/stories/${storyId}/chapters`);
   } catch (err) {
     logger.error('Lỗi khi sửa chương:', err);
-    req.flash('error_msg', 'Lỗi khi cập nhật chương!');
+    req.flash('error_msg', 'Lỗi khi cập nhật chương: ' + (err.message || 'Lỗi hệ thống'));
     res.redirect(`/author/stories/${storyId}/chapters/${chapterId}/edit`);
   }
 };

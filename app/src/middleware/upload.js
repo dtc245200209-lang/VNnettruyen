@@ -42,6 +42,26 @@ const uploadCover = multer({
   }
 });
 
+// Middleware bọc để bắt lỗi tải file sạch sẽ không bị crash 500
+function handleUploadCover(req, res, next) {
+  const uploadSingle = uploadCover.single('cover_file');
+  uploadSingle(req, res, function (err) {
+    if (err instanceof multer.MulterError) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        req.flash('error_msg', 'Tệp ảnh tải lên quá lớn! Vui lòng chọn ảnh dưới 5MB.');
+      } else {
+        req.flash('error_msg', `Lỗi tải ảnh: ${err.message}`);
+      }
+      return res.redirect('back');
+    } else if (err) {
+      req.flash('error_msg', err.message || 'Lỗi định dạng tệp ảnh!');
+      return res.redirect('back');
+    }
+    next();
+  });
+}
+
 module.exports = {
-  uploadCover
+  uploadCover,
+  handleUploadCover
 };
