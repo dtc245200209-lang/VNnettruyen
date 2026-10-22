@@ -35,19 +35,18 @@
     <img src="/public/images/banner-spotlight.jpg" alt="Spotlight" class="spotlight-bg-img">
     <div class="spotlight-overlay-box">
       <div>
-        <div style="font-size: 0.75rem; color: #fcd34d; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">
-          ⭐ Tác Phẩm Nổi Bật Trong Tuần
+        <div class="spotlight-badge">
+          <span>⭐</span> TÁC PHẨM NỔI BẬT TRONG TUẦN
         </div>
-        <h2 class="spotlight-title"><%= spotlightStory.title %></h2>
         
-        <div class="spotlight-meta-line">
-          Tác giả: <strong><%= spotlightStory.author_name %></strong>
-        </div>
-        <div class="spotlight-meta-line">
-          Thể loại: <strong><%= spotlightStory.primary_genre || 'Kiếm Hiệp / Dã Sử' %></strong>
-        </div>
-        <div class="spotlight-meta-line">
-          Lượt xem: <strong><%= spotlightStory.views %></strong>
+        <h2 class="spotlight-title">
+          <a href="/stories/<%= spotlightStory.slug %>"><%= spotlightStory.title %></a>
+        </h2>
+        
+        <div class="spotlight-tags-row">
+          <span class="spotlight-tag">👤 <%= spotlightStory.author_name %></span>
+          <span class="spotlight-tag">⚔️ <%= spotlightStory.primary_genre || 'Kiếm Hiệp / Dã Sử' %></span>
+          <span class="spotlight-tag">🔥 <%= (spotlightStory.views || 0).toLocaleString('vi-VN') %> lượt xem</span>
         </div>
 
         <div class="spotlight-desc">
@@ -56,7 +55,8 @@
       </div>
 
       <a href="/stories/<%= spotlightStory.slug %>" class="btn btn-spotlight-read">
-        📖 Đọc bài ngay
+        <span>📖 Đọc tác phẩm ngay</span>
+        <span>&rarr;</span>
       </a>
     </div>
   </section>
@@ -112,11 +112,10 @@
       <button type="submit" class="btn-forum-filter">Tìm kiếm</button>
     </form>
 
-    <!-- 3.3. Thông Báo Diễn Đàn & Nội Quy (Bulletin Box with Mascot) -->
+    <!-- 3.3. Thông Báo Diễn Đàn & Nội Quy (Bulletin Box) -->
     <div class="forum-bulletin-box">
-      <img src="/public/images/mascot.png" alt="Mascot Chibi" class="bulletin-mascot-img">
-      <div style="font-size: 0.85rem; color: #ea580c; font-weight: 800; margin-bottom: 6px;">
-        📢 BẢNG TIN & THÔNG BÁO TỪ BAN QUẢN TRỊ
+      <div style="font-size: 0.88rem; color: #ea580c; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+        <span>📢</span> BẢNG TIN & THÔNG BÁO TỪ BAN QUẢN TRỊ
       </div>
       <% if (announcements && announcements.length > 0) { %>
         <% announcements.forEach(item => { %>

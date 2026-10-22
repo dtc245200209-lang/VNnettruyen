@@ -7,6 +7,13 @@
 
   <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
     <h1 class="section-title">👥 Quản Lý Thành Viên (<%= users ? users.length : 0 %>)</h1>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <a href="/admin/users" class="btn btn-primary btn-sm">👥 Người dùng</a>
+      <a href="/admin/stories" class="btn btn-secondary btn-sm">📚 Truyện</a>
+      <a href="/admin/genres" class="btn btn-secondary btn-sm">🏷️ Thể loại</a>
+      <a href="/admin/comments" class="btn btn-secondary btn-sm">💬 Bình luận</a>
+      <a href="/admin/announcements" class="btn btn-secondary btn-sm">📢 Bảng Tin</a>
+    </div>
   </div>
 
   <!-- Search & Filter -->

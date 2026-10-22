@@ -28,4 +28,11 @@ router.post('/genres/:genreId/delete', adminController.deleteGenre);
 router.get('/comments', adminController.getComments);
 router.post('/comments/:commentId/delete', adminController.deleteCommentAdmin);
 
+// Quản lý Bảng Tin & Thông Báo Ban Quản Trị
+router.get('/announcements', adminController.getAnnouncements);
+router.post('/announcements', adminController.postCreateAnnouncement);
+router.get('/announcements/:id/edit', adminController.getEditAnnouncement);
+router.post('/announcements/:id/edit', adminController.postEditAnnouncement);
+router.post('/announcements/:id/delete', adminController.deleteAnnouncement);
+
 module.exports = router;

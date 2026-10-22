@@ -313,3 +313,108 @@ exports.deleteCommentAdmin = async (req, res) => {
     res.redirect('/admin/comments');
   }
 };
+
+// 13. Quản lý Bảng Tin & Thông Báo Ban Quản Trị
+exports.getAnnouncements = async (req, res) => {
+  try {
+    const [announcements] = await db.query(
+      'SELECT * FROM forum_announcements ORDER BY display_order ASC, id ASC'
+    );
+    res.render('pages/admin/announcements', {
+      title: 'Quản lý Bảng Tin & Thông Báo - VNnettruyen Admin',
+      announcements
+    });
+  } catch (err) {
+    logger.error('Lỗi tải danh sách thông báo admin:', err);
+    req.flash('error_msg', 'Lỗi tải danh sách thông báo bảng tin!');
+    res.redirect('/admin');
+  }
+};
+
+// 14. Thêm Thông Báo Mới
+exports.postCreateAnnouncement = async (req, res) => {
+  const { title, url, color, display_order } = req.body;
+  if (!title || title.trim() === '' || !url || url.trim() === '') {
+    req.flash('error_msg', 'Tiêu đề thông báo và đường dẫn liên kết không được để trống!');
+    return res.redirect('/admin/announcements');
+  }
+
+  try {
+    const orderNum = parseInt(display_order, 10) || 0;
+    await db.query(
+      'INSERT INTO forum_announcements (title, url, color, display_order) VALUES (?, ?, ?, ?)',
+      [title.trim(), url.trim(), color ? color.trim() : '#e74c3c', orderNum]
+    );
+
+    logger.info(`Admin ID ${req.session.user.id} vừa tạo thông báo bảng tin mới: "${title.trim()}"`);
+    req.flash('success_msg', 'Đã thêm thông báo bảng tin mới thành công!');
+    res.redirect('/admin/announcements');
+  } catch (err) {
+    logger.error('Lỗi tạo thông báo:', err);
+    req.flash('error_msg', 'Lỗi hệ thống khi tạo thông báo: ' + (err.message || ''));
+    res.redirect('/admin/announcements');
+  }
+};
+
+// 15. Giao diện Sửa Thông Báo
+exports.getEditAnnouncement = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [rows] = await db.query('SELECT * FROM forum_announcements WHERE id = ?', [id]);
+    if (rows.length === 0) {
+      req.flash('error_msg', 'Không tìm thấy thông báo cần sửa!');
+      return res.redirect('/admin/announcements');
+    }
+
+    res.render('pages/admin/edit-announcement', {
+      title: 'Sửa Thông Báo Bảng Tin - VNnettruyen Admin',
+      announcement: rows[0]
+    });
+  } catch (err) {
+    logger.error('Lỗi tải thông báo cần sửa:', err);
+    req.flash('error_msg', 'Lỗi hệ thống khi tải thông tin thông báo!');
+    res.redirect('/admin/announcements');
+  }
+};
+
+// 16. Xử lý Lưu Cập Nhật Thông Báo Sau Khi Sửa
+exports.postEditAnnouncement = async (req, res) => {
+  const { id } = req.params;
+  const { title, url, color, display_order } = req.body;
+
+  if (!title || title.trim() === '' || !url || url.trim() === '') {
+    req.flash('error_msg', 'Tiêu đề thông báo và đường dẫn liên kết không được để trống!');
+    return res.redirect(`/admin/announcements/${id}/edit`);
+  }
+
+  try {
+    const orderNum = parseInt(display_order, 10) || 0;
+    await db.query(
+      'UPDATE forum_announcements SET title = ?, url = ?, color = ?, display_order = ? WHERE id = ?',
+      [title.trim(), url.trim(), color ? color.trim() : '#e74c3c', orderNum, id]
+    );
+
+    logger.info(`Admin ID ${req.session.user.id} đã cập nhật thông báo ID ${id}: "${title.trim()}"`);
+    req.flash('success_msg', 'Đã cập nhật thông tin thông báo bảng tin thành công!');
+    res.redirect('/admin/announcements');
+  } catch (err) {
+    logger.error('Lỗi khi sửa thông báo:', err);
+    req.flash('error_msg', 'Lỗi khi cập nhật thông báo: ' + (err.message || ''));
+    res.redirect(`/admin/announcements/${id}/edit`);
+  }
+};
+
+// 17. Xóa Thông Báo
+exports.deleteAnnouncement = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await db.query('DELETE FROM forum_announcements WHERE id = ?', [id]);
+    logger.info(`Admin ID ${req.session.user.id} đã xóa thông báo ID ${id}`);
+    req.flash('success_msg', 'Đã xóa thông báo khỏi bảng tin!');
+    res.redirect('/admin/announcements');
+  } catch (err) {
+    logger.error('Lỗi xóa thông báo:', err);
+    req.flash('error_msg', 'Lỗi khi xóa thông báo!');
+    res.redirect('/admin/announcements');
+  }
+};

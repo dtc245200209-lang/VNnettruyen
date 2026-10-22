@@ -5,8 +5,19 @@
     <a href="/admin">Quản trị</a> &gt; <strong style="color: var(--text-primary);">Quản lý Bình Luận</strong>
   </div>
 
-  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
-    <h1 class="section-title">💬 Kiểm Duyệt Bình Luận Toàn Hệ Thống (<%= comments ? comments.length : 0 %>)</h1>
+  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 24px;">
+    <div>
+      <h1 class="section-title">💬 Kiểm Duyệt Bình Luận Toàn Hệ Thống (<%= comments ? comments.length : 0 %>)</h1>
+      <p style="color: var(--text-muted); font-size: 0.85rem;">Kiểm duyệt và gỡ bỏ bình luận vi phạm trên diễn đàn</p>
+    </div>
+
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <a href="/admin/users" class="btn btn-secondary btn-sm">👥 Người dùng</a>
+      <a href="/admin/stories" class="btn btn-secondary btn-sm">📚 Truyện</a>
+      <a href="/admin/genres" class="btn btn-secondary btn-sm">🏷️ Thể loại</a>
+      <a href="/admin/comments" class="btn btn-primary btn-sm">💬 Bình luận</a>
+      <a href="/admin/announcements" class="btn btn-secondary btn-sm">📢 Bảng Tin</a>
+    </div>
   </div>
 
   <!-- Search -->

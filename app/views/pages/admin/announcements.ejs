@@ -1,0 +1,131 @@
+<%- include('../../partials/header') %>
+
+<div style="margin: 20px 0;">
+  <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+    <a href="/admin">Quản trị</a> &gt; <strong style="color: var(--text-main);">Quản lý Bảng Tin & Thông Báo</strong>
+  </div>
+
+  <div class="forum-card">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 20px;">
+      <div>
+        <h1 style="font-size: 1.4rem; font-weight: 800; color: var(--text-main);">📢 Bảng Tin & Thông Báo Ban Quản Trị</h1>
+        <p style="color: var(--text-muted); font-size: 0.85rem;">Quản lý các thông báo, cẩm nang và nội quy hiển thị trên trang chủ diễn đàn</p>
+      </div>
+
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <a href="/admin/users" class="btn btn-secondary btn-sm">👥 Người dùng</a>
+        <a href="/admin/stories" class="btn btn-secondary btn-sm">📚 Truyện</a>
+        <a href="/admin/genres" class="btn btn-secondary btn-sm">🏷️ Thể loại</a>
+        <a href="/admin/comments" class="btn btn-secondary btn-sm">💬 Bình luận</a>
+        <a href="/admin/announcements" class="btn btn-primary btn-sm">📢 Bảng Tin</a>
+      </div>
+    </div>
+
+    <div class="forum-main-layout" style="grid-template-columns: 1fr 360px;">
+      <!-- Cột Trái: Danh Sách Thông Báo Hiện Có -->
+      <div>
+        <div class="top-shelf-header" style="margin-bottom: 14px;">
+          <span>📋</span> Danh Sách Thông Báo (<%= announcements ? announcements.length : 0 %>)
+        </div>
+
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">TT</th>
+                <th>Tiêu đề thông báo</th>
+                <th>Đường dẫn liên kết</th>
+                <th style="width: 140px; text-align: center;">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (announcements && announcements.length > 0) { %>
+                <% announcements.forEach(item => { %>
+                  <tr>
+                    <td style="text-align: center; font-weight: 700;">
+                      <span style="background-color: var(--bg-card-header); border: 1px solid var(--border-color); padding: 2px 8px; border-radius: 4px;">
+                        <%= item.display_order %>
+                      </span>
+                    </td>
+                    <td>
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: <%= item.color || '#e74c3c' %>; flex-shrink: 0;"></span>
+                        <strong style="color: <%= item.color || 'inherit' %>;"><%= item.title %></strong>
+                      </div>
+                    </td>
+                    <td>
+                      <a href="<%= item.url %>" target="_blank" style="color: var(--accent-blue); font-size: 0.82rem; word-break: break-all;">
+                        <%= item.url %> ↗
+                      </a>
+                    </td>
+                    <td style="text-align: center;">
+                      <div style="display: flex; gap: 6px; justify-content: center;">
+                        <a href="/admin/announcements/<%= item.id %>/edit" class="btn btn-secondary btn-sm" title="Chỉnh sửa thông báo này">
+                          ✏️ Sửa
+                        </a>
+                        <form action="/admin/announcements/<%= item.id %>/delete" method="POST" class="confirm-delete" data-confirm-message="Bạn có chắc chắn muốn xóa thông báo '<%= item.title %>'?">
+                          <button type="submit" class="btn btn-danger btn-sm" title="Xóa thông báo">
+                            🗑️
+                          </button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="4" style="text-align: center; padding: 30px; color: var(--text-muted);">
+                    Chưa có thông báo nào. Hãy thêm thông báo đầu tiên ở khung bên phải!
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Cột Phải: Form Thêm Thông Báo Mới -->
+      <div>
+        <div style="background-color: var(--bg-card-header); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
+          <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin-bottom: 14px; display: flex; align-items: center; gap: 6px;">
+            <span>➕</span> Thêm Thông Báo Mới
+          </h3>
+
+          <form action="/admin/announcements" method="POST">
+            <div class="form-group">
+              <label class="form-label">Tiêu đề thông báo <span style="color: var(--accent-blue);">*</span></label>
+              <input type="text" name="title" class="form-control" placeholder="Ví dụ: Hướng dẫn đăng ký bút danh tác giả mới..." required spellcheck="false">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Đường dẫn liên kết (URL) <span style="color: var(--accent-blue);">*</span></label>
+              <input type="text" name="url" class="form-control" placeholder="Ví dụ: /forum/categories/thong-bao-noi-quy hoặc /author" required spellcheck="false">
+              <small style="color: var(--text-muted); font-size: 0.75rem; display: block; margin-top: 4px;">
+                Đường dẫn nội bộ trang (bắt đầu bằng dấu /) hoặc link website ngoài.
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Màu sắc hiển thị tiêu đề</label>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="color" name="color" value="#e74c3c" style="width: 44px; height: 36px; padding: 2px; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer;">
+                <span style="font-size: 0.8rem; color: var(--text-muted);">Chọn màu nổi bật trên bảng tin</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Thứ tự hiển thị (Ưu tiên số nhỏ)</label>
+              <input type="number" name="display_order" class="form-control" value="1" min="0" style="max-width: 140px;">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 8px;">
+              🚀 Đăng Thông Báo Lên Bảng Tin
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../../partials/footer') %>

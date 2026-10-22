@@ -190,15 +190,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 8. Đóng floating helper bar
-  const closeFloatingHelper = document.getElementById('close-floating-helper');
-  const floatingHelper = document.getElementById('floating-helper-widget');
-  if (closeFloatingHelper && floatingHelper) {
-    closeFloatingHelper.addEventListener('click', (e) => {
-      e.stopPropagation();
-      floatingHelper.style.display = 'none';
-    });
-  }
 
   // 9. Xác nhận xóa
   const deleteForms = document.querySelectorAll('.confirm-delete');

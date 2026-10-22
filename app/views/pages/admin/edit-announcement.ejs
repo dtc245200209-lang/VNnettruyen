@@ -1,0 +1,63 @@
+<%- include('../../partials/header') %>
+
+<div style="max-width: 700px; margin: 30px auto;">
+  <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+    <a href="/admin">Quản trị</a> &gt; 
+    <a href="/admin/announcements">Bảng Tin & Thông Báo</a> &gt; 
+    <strong style="color: var(--text-main);">Chỉnh Sửa Thông Báo</strong>
+  </div>
+
+  <div class="forum-card">
+    <div style="margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 14px;">
+      <h1 style="font-size: 1.35rem; font-weight: 800; color: var(--text-main);">
+        ✏️ Chỉnh Sửa Thông Báo Bảng Tin (ID: <%= announcement.id %>)
+      </h1>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">
+        Cập nhật tiêu đề, đường dẫn, màu sắc và vị trí hiển thị của thông báo trên trang chủ
+      </p>
+    </div>
+
+    <form action="/admin/announcements/<%= announcement.id %>/edit" method="POST">
+      <div class="form-group">
+        <label class="form-label">Tiêu đề thông báo <span style="color: #ef4444;">*</span></label>
+        <input type="text" name="title" class="form-control" value="<%= announcement.title %>" required spellcheck="false">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Đường dẫn liên kết (URL) <span style="color: #ef4444;">*</span></label>
+        <input type="text" name="url" class="form-control" value="<%= announcement.url %>" required spellcheck="false">
+        <small style="color: var(--text-muted); font-size: 0.78rem; display: block; margin-top: 4px;">
+          Đường dẫn khi thành viên nhấp vào thông báo (ví dụ: /forum/categories/thong-bao-noi-quy).
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Màu sắc hiển thị tiêu đề</label>
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <input type="color" name="color" value="<%= announcement.color || '#e74c3c' %>" style="width: 50px; height: 38px; padding: 2px; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer;">
+          <input type="text" value="<%= announcement.color || '#e74c3c' %>" class="form-control" style="max-width: 130px; font-family: monospace;" readonly>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Màu chữ thông báo trên bảng tin</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Thứ tự ưu tiên hiển thị</label>
+        <input type="number" name="display_order" class="form-control" value="<%= announcement.display_order %>" min="0" style="max-width: 140px;">
+        <small style="color: var(--text-muted); font-size: 0.78rem; display: block; margin-top: 4px;">
+          Số càng nhỏ thì hiển thị càng ưu tiên ở dòng đầu tiên.
+        </small>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 24px;">
+        <button type="submit" class="btn btn-primary btn-lg">
+          💾 Lưu Cập Nhật Thông Báo
+        </button>
+        <a href="/admin/announcements" class="btn btn-secondary btn-lg">
+          Hủy bỏ & Quay lại
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('../../partials/footer') %>
