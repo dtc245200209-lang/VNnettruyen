@@ -17,6 +17,12 @@ exports.getDashboard = async (req, res) => {
   const userId = req.session.user.id;
 
   try {
+    // Tự động nâng cấp quyền 'author' nếu thành viên đang là 'reader'
+    if (req.session.user && req.session.user.role === 'reader') {
+      req.session.user.role = 'author';
+      await db.query("UPDATE users SET role = 'author' WHERE id = ?", [userId]);
+    }
+
     const [stories] = await db.query(`
       SELECT s.*,
              (SELECT COUNT(*) FROM chapters WHERE story_id = s.id) AS chapter_count,
@@ -40,6 +46,11 @@ exports.getDashboard = async (req, res) => {
 // 2. Giao diện Đăng truyện mới
 exports.getCreateStory = async (req, res) => {
   try {
+    if (req.session.user && req.session.user.role === 'reader') {
+      req.session.user.role = 'author';
+      await db.query("UPDATE users SET role = 'author' WHERE id = ?", [req.session.user.id]);
+    }
+
     const [genres] = await db.query('SELECT * FROM genres ORDER BY name ASC');
     res.render('pages/author/create-story', {
       title: 'Đăng Truyện Mới - Studio Tác Giả',
@@ -63,6 +74,10 @@ exports.postCreateStory = async (req, res) => {
   }
 
   try {
+    if (req.session.user && req.session.user.role === 'reader') {
+      req.session.user.role = 'author';
+      await db.query("UPDATE users SET role = 'author' WHERE id = ?", [userId]);
+    }
     let slug = createVietnameseSlug(title);
     
     // Kiểm tra xem slug đã trùng chưa, nếu có thì thêm hậu tố

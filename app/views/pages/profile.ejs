@@ -16,7 +16,9 @@
     </div>
 
     <div style="display: flex; gap: 8px;">
-      <% if (profileUser.role === 'author' || profileUser.role === 'admin') { %>
+      <% if (currentUser && currentUser.id === profileUser.id) { %>
+        <a href="/author" class="btn btn-primary">✍️ Studio Tác Giả</a>
+      <% } else if (profileUser.role === 'author' || profileUser.role === 'admin') { %>
         <a href="/author" class="btn btn-primary">✍️ Studio Tác Giả</a>
       <% } %>
       <% if (profileUser.role === 'admin') { %>

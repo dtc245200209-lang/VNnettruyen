@@ -217,8 +217,8 @@ CREATE TABLE `forum_replies` (
 INSERT INTO `users` (`id`, `username`, `email`, `password`, `role`, `coins`, `bio`) VALUES
 (1, 'admin', 'admin@vnnettruyen.vn', '$2a$10$hUDBVbJCiwdiA4Okox8qtOmrpnpSulIm.Hcl7oXSHSGM.t9rj4cD6', 'admin', 0, 'Quản trị viên diễn đàn VNnettruyen - Hỗ trợ cộng đồng sáng tác'),
 (2, 'ThanhPhongKiemKhach', 'thanhphong@vnnettruyen.vn', '$2a$10$hUDBVbJCiwdiA4Okox8qtOmrpnpSulIm.Hcl7oXSHSGM.t9rj4cD6', 'author', 0, 'Tác giả sáng tác dã sử, kiếm hiệp và huyền huyễn Việt Nam'),
-(3, 'MinhNguyetDocGia', 'minhnguyet@vnnettruyen.vn', '$2a$10$hUDBVbJCiwdiA4Okox8qtOmrpnpSulIm.Hcl7oXSHSGM.t9rj4cD6', 'reader', 0, 'Độc giả thân thiết & nhà phê bình văn học tại VNnettruyen'),
-(4, 'Meovangnho', 'Nami241@gmail.com', '$2a$10$hUDBVbJCiwdiA4Okox8qtOmrpnpSulIm.Hcl7oXSHSGM.t9rj4cD6', 'reader', 0, 'Thành viên cộng đồng đam mê đọc và thảo luận truyện');
+(3, 'MinhNguyetDocGia', 'minhnguyet@vnnettruyen.vn', '$2a$10$hUDBVbJCiwdiA4Okox8qtOmrpnpSulIm.Hcl7oXSHSGM.t9rj4cD6', 'author', 0, 'Độc giả thân thiết & nhà phê bình văn học tại VNnettruyen'),
+(4, 'Meovangnho', 'Nami241@gmail.com', '$2a$10$hUDBVbJCiwdiA4Okox8qtOmrpnpSulIm.Hcl7oXSHSGM.t9rj4cD6', 'author', 0, 'Thành viên cộng đồng đam mê đọc và thảo luận truyện');
 
 -- 6 THỂ LOẠI TRUYỆN CHÍNH (ĐÃ BỎ TIÊN HIỆP THEO YÊU CẦU)
 INSERT INTO `genres` (`id`, `name`, `slug`, `description`) VALUES

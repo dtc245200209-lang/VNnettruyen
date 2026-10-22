@@ -5,8 +5,8 @@ const { requireAuth, requireRole } = require('../middleware/auth');
 
 const { handleUploadCover } = require('../middleware/upload');
 
-// Bảo vệ toàn bộ router tác giả: yêu cầu đăng nhập và có quyền 'author' hoặc 'admin'
-router.use(requireAuth, requireRole(['author', 'admin']));
+// Bảo vệ toàn bộ router tác giả: yêu cầu đăng nhập (tất cả thành viên đều có quyền sáng tác)
+router.use(requireAuth);
 
 // Dashboard truyện tác giả
 router.get('/', authorController.getDashboard);
